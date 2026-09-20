@@ -7,7 +7,7 @@ public record AddressResponseDto(
         String postalCode,
         String city,
         String region,
-        String apartment,
+        String roomNumber,
         double latitude,
         double longitude
 ) {

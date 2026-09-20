@@ -6,6 +6,7 @@ import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationP
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
 
 public interface AccommodationService {
     AccommodationResponseDto save(AccommodationRequestDto request);
@@ -13,6 +14,8 @@ public interface AccommodationService {
     Page<AccommodationShortResponseDto> findAll(Pageable pageable);
 
     AccommodationResponseDto findById(Long id);
+
+    AccommodationResponseDto updateById(Long id, AccommodationUpdateRequestDto request);
 
     AccommodationResponseDto patchById(Long id, AccommodationPatchRequestDto request);
 

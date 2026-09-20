@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,6 +21,7 @@ import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationP
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
 import mate.academy.accommodationbookingservice.service.AccommodationService;
 
 @Tag(
@@ -49,6 +51,14 @@ public class AccommodationController {
     @GetMapping("/{id}")
     public AccommodationResponseDto findByIdAccommodation(@PathVariable Long id) {
         return accommodationService.findById(id);
+    }
+
+    @Operation(summary = "Update single accommodation by ID")
+    @PutMapping("/{id}")
+    public AccommodationResponseDto updateByIdAccommodation(
+            @PathVariable Long id,
+            @RequestBody @Valid AccommodationUpdateRequestDto request) {
+        return accommodationService.updateById(id, request);
     }
 
     @Operation(summary = "Patch single accommodation by ID")

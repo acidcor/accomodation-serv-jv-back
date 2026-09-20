@@ -9,7 +9,6 @@ import lombok.Setter;
 public class AddressRequestDto {
     @NotBlank
     private String streetLineOne;
-    @NotBlank
     private String streetLineTwo;
     @NotBlank
     private String postalCode;
@@ -18,7 +17,7 @@ public class AddressRequestDto {
     @NotBlank
     private String region;
     @NotBlank
-    private String apartment;
+    private String roomNumber;
     private double latitude;
     private double longitude;
 }
