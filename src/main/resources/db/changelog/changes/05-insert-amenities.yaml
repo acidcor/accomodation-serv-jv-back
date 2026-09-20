@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-amenities
+      author: acor
+      changes:
+        - insert:
+            tableName: amenities
+            columns:
+              - column:
+                  name: name
+                  value: "Wi-Fi"
+              - column:
+                  name: description
+                  value: "Wireless internet access"
+        - insert:
+            tableName: amenities
+            columns:
+              - column:
+                  name: name
+                  value: "Parking"
+              - column:
+                  name: description
+                  value: "Free parking available"
+        - insert:
+            tableName: amenities
+            columns:
+              - column:
+                  name: name
+                  value: "Swimming Pool"
+              - column:
+                  name: description
+                  value: "Outdoor swimming pool"
+        - insert:
+            tableName: amenities
+            columns:
+              - column:
+                  name: name
+                  value: "Air Conditioning"
+              - column:
+                  name: description
+                  value: "Air conditioning available"
+        - insert:
+            tableName: amenities
+            columns:
+              - column:
+                  name: name
+                  value: "Kitchen"
+              - column:
+                  name: description
+                  value: "Fully equipped kitchen"
