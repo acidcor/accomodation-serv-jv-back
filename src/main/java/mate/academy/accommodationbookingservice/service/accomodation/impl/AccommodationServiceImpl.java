@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.service.impl;
+package mate.academy.accommodationbookingservice.service.accomodation.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Amenity;
 import mate.academy.accommodationbookingservice.repository.AccommodationRepository;
 import mate.academy.accommodationbookingservice.repository.AmenityRepository;
-import mate.academy.accommodationbookingservice.service.AccommodationService;
+import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
 
 @RequiredArgsConstructor
 @Service

@@ -39,8 +39,7 @@ public class Accommodation {
 
     @OneToOne(
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
     )
     @JoinColumn(
             name = "address_id", nullable = false

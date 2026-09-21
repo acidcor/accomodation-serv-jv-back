@@ -3,6 +3,7 @@ package mate.academy.accommodationbookingservice.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,7 +23,7 @@ import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationR
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
-import mate.academy.accommodationbookingservice.service.AccommodationService;
+import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
 
 @Tag(
         name = "Accommodations",
@@ -33,6 +34,7 @@ import mate.academy.accommodationbookingservice.service.AccommodationService;
 public class AccommodationController {
     private final AccommodationService accommodationService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create an accommodation")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -53,6 +55,7 @@ public class AccommodationController {
         return accommodationService.findById(id);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update single accommodation by ID")
     @PutMapping("/{id}")
     public AccommodationResponseDto updateByIdAccommodation(
@@ -61,6 +64,7 @@ public class AccommodationController {
         return accommodationService.updateById(id, request);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Patch single accommodation by ID")
     @PatchMapping("/{id}")
     public AccommodationResponseDto patchByIdAccommodation(
@@ -69,6 +73,7 @@ public class AccommodationController {
         return accommodationService.patchById(id, request);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Delete single accommodation by ID")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

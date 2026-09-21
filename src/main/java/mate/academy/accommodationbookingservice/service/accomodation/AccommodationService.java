@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.service;
+package mate.academy.accommodationbookingservice.service.accomodation;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
