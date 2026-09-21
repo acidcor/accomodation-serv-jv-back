@@ -27,7 +27,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(exclude = "password")
-public class    User implements UserDetails {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

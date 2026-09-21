@@ -1,9 +1,9 @@
 package mate.academy.accommodationbookingservice.annotation;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class FieldMatchImpl implements ConstraintValidator<FieldMatch, Object> {
     private String firstFieldName;
