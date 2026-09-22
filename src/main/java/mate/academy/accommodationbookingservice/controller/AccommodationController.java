@@ -18,11 +18,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationPatchRequestDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
 import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
 
 @Tag(

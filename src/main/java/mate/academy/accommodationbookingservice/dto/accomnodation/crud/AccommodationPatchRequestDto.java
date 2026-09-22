@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.dto.accomnodation;
+package mate.academy.accommodationbookingservice.dto.accomnodation.crud;
 
 import java.math.BigDecimal;
 import java.util.List;

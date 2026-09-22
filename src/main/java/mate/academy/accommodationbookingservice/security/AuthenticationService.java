@@ -5,8 +5,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
-import mate.academy.accommodationbookingservice.dto.user.UserLoginRequestDto;
-import mate.academy.accommodationbookingservice.dto.user.UserLoginResponseDto;
+import mate.academy.accommodationbookingservice.dto.user.auth.UserLoginRequestDto;
+import mate.academy.accommodationbookingservice.dto.user.auth.UserLoginResponseDto;
 
 @RequiredArgsConstructor
 @Service
