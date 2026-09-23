@@ -13,11 +13,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(
             "FROM User u "
-                    + "LEFT JOIN FETCH u.roles"
-                    + " WHERE u.email = :email"
+            + "LEFT JOIN FETCH u.roles"
+            + " WHERE u.email = :email"
     )
     Optional<User> getUserByEmail(String email);
 
-    @EntityGraph(attributePaths = {"roles"})
+    @EntityGraph(attributePaths = "roles")
     Optional<User> getUserById(Long id);
 }

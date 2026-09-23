@@ -16,6 +16,7 @@ import mate.academy.accommodationbookingservice.dto.user.auth.UserRegisterReques
 import mate.academy.accommodationbookingservice.dto.user.crud.UserPatchRequestDto;
 import mate.academy.accommodationbookingservice.dto.user.crud.UserRolesUpdateDto;
 import mate.academy.accommodationbookingservice.dto.user.crud.UserUpdateRequestDto;
+import mate.academy.accommodationbookingservice.exception.EmailExistenceException;
 import mate.academy.accommodationbookingservice.exception.RegistrationException;
 import mate.academy.accommodationbookingservice.mapper.UserMapper;
 import mate.academy.accommodationbookingservice.model.Role;
@@ -87,13 +88,14 @@ public class UserServiceImpl implements UserService {
             Authentication authentication,
             UserUpdateRequestDto request) {
         User user = getUserByAuth(authentication);
+        String requestEmail = request.getEmail();
+        String currentEmail = user.getEmail();
+        checkEmail(requestEmail, currentEmail);
         userMapper.updateUser(request, user);
-        String rawPass = request.getPassword();
-        if (rawPass != null) {
-            String password = passwordEncoder.encode(rawPass);
-            user.setPassword(password);
-        }
-        return userMapper.toDto(userRepository.save(user));
+        return getResponseDto(
+                user,
+                request.getPassword()
+        );
     }
 
     @Override
@@ -101,13 +103,16 @@ public class UserServiceImpl implements UserService {
             Authentication authentication,
             UserPatchRequestDto request) {
         User user = getUserByAuth(authentication);
-        userMapper.patchUser(request, user);
-        String rawPass = request.getPassword();
-        if (rawPass != null) {
-            String password = passwordEncoder.encode(rawPass);
-            user.setPassword(password);
+        String requestEmail = request.getEmail();
+        if (requestEmail != null) {
+            String currentEmail = user.getEmail();
+            checkEmail(requestEmail, currentEmail);
         }
-        return userMapper.toDto(userRepository.save(user));
+        userMapper.patchUser(request, user);
+        return getResponseDto(
+                user,
+                request.getPassword()
+        );
     }
 
     private Set<Long> checkRoles(Set<Long> rolesIds, List<RoleEntity> roles) {
@@ -131,5 +136,25 @@ public class UserServiceImpl implements UserService {
             );
         }
         return user;
+    }
+
+    private UserResponseDto getResponseDto(User user, String rawPass) {
+        if (rawPass != null) {
+            user.setPassword(getEncodedPass(rawPass));
+        }
+        return userMapper.toDto(userRepository.save(user));
+    }
+
+    private void checkEmail(String requestEmail, String currentEmail) {
+        if (!requestEmail.equalsIgnoreCase(currentEmail)
+                && userRepository.existsByEmail(requestEmail)) {
+            throw new EmailExistenceException(
+                    "User with such email already exists: "
+                    + requestEmail);
+        }
+    }
+
+    private String getEncodedPass(String rawPass) {
+        return passwordEncoder.encode(rawPass);
     }
 }
