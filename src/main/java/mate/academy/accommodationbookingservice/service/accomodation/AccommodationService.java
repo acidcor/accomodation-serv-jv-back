@@ -1,12 +1,12 @@
-package mate.academy.accommodationbookingservice.service;
+package mate.academy.accommodationbookingservice.service.accomodation;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationPatchRequestDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
 
 public interface AccommodationService {
     AccommodationResponseDto save(AccommodationRequestDto request);

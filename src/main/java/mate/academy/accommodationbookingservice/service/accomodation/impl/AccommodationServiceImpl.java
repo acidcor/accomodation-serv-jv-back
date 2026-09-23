@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.service.impl;
+package mate.academy.accommodationbookingservice.service.accomodation.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationPatchRequestDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
 import mate.academy.accommodationbookingservice.mapper.AccommodationMapper;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Amenity;
 import mate.academy.accommodationbookingservice.repository.AccommodationRepository;
 import mate.academy.accommodationbookingservice.repository.AmenityRepository;
-import mate.academy.accommodationbookingservice.service.AccommodationService;
+import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
 
 @RequiredArgsConstructor
 @Service

@@ -6,11 +6,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import mate.academy.accommodationbookingservice.config.MapperConfig;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationPatchRequestDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationShortResponseDto;
-import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationUpdateRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
+import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 
 @Mapper(config = MapperConfig.class, uses = {AddressMapper.class, AmenityMapper.class})
