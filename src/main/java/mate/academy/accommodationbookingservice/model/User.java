@@ -21,12 +21,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET is_deleted=true WHERE id = ?")
-@SQLRestriction("is_deleted <> true")
 @Getter
 @Setter
 @ToString(exclude = "password")
+@SQLDelete(sql = "UPDATE users SET is_deleted=true WHERE id = ?")
+@SQLRestriction("is_deleted <> true")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,3 +80,5 @@ public class User implements UserDetails {
         return !isDeleted;
     }
 }
+
+
