@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.service.accomodation.impl;
+package mate.academy.accommodationbookingservice.service.accommodation.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Amenity;
 import mate.academy.accommodationbookingservice.repository.AccommodationRepository;
 import mate.academy.accommodationbookingservice.repository.AmenityRepository;
-import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
+import mate.academy.accommodationbookingservice.service.accommodation.AccommodationService;
 
 @RequiredArgsConstructor
 @Service
@@ -51,7 +51,7 @@ public class AccommodationServiceImpl implements AccommodationService {
         Accommodation accommodation = accommodationRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Can't find accomodation with ID: " + id)
+                        () -> new EntityNotFoundException("Can't find accommodation with ID: " + id)
                 );
         return accommodationMapper.toDto(accommodation);
     }
@@ -61,7 +61,7 @@ public class AccommodationServiceImpl implements AccommodationService {
         Accommodation accommodation = accommodationRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Can't find accomodation with ID: " + id)
+                        () -> new EntityNotFoundException("Can't find accommodation with ID: " + id)
                 );
         accommodationMapper.updateEntity(request, accommodation);
         List<Amenity> amenities = findAmenities(request.getAmenities());
@@ -76,7 +76,7 @@ public class AccommodationServiceImpl implements AccommodationService {
         Accommodation accommodation = accommodationRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Can't find accomodation with ID: " + id)
+                        () -> new EntityNotFoundException("Can't find accommodation with ID: " + id)
                 );
         accommodationMapper.patchEntity(request, accommodation);
         if (request.getAmenities() != null) {
