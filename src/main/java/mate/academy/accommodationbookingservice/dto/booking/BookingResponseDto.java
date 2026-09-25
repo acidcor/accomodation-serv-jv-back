@@ -15,5 +15,5 @@ public class BookingResponseDto {
     private LocalDate checkOut;
     private AccommodationResponseDto accommodation;
     private UserResponseDto user;
-    private BookingStatus bookingStatus;
+    private BookingStatus status;
 }

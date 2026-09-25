@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             WHERE b.accommodation = :accommodation
               AND b.checkIn < :checkOut
               AND b.checkOut > :checkIn
-              AND b.bookingStatus NOT IN ('CANCELED', 'EXPIRED')
+              AND b.status NOT IN ('CANCELED', 'EXPIRED')
             """)
     boolean existsBookingInRequestDates(Accommodation accommodation, LocalDate checkIn,
                                         LocalDate checkOut);
@@ -32,7 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
               AND b.id <> :bookingId
               AND b.checkIn < :checkOut
               AND b.checkOut > :checkIn
-              AND b.bookingStatus NOT IN ('CANCELED', 'EXPIRED')
+              AND b.status NOT IN ('CANCELED', 'EXPIRED')
             """)
     boolean existsBookingInRequestDatesExcludingId(
             Accommodation accommodation,

@@ -43,8 +43,9 @@ public class Booking {
     )
     @JoinColumn(nullable = false)
     private User user;
+    @NotNull
     @Enumerated(value = EnumType.STRING)
-    private BookingStatus bookingStatus;
+    private BookingStatus status;
     @NotNull
     private boolean isDeleted = false;
 }
