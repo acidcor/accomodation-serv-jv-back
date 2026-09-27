@@ -2,8 +2,6 @@ package mate.academy.accommodationbookingservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,9 +21,8 @@ import mate.academy.accommodationbookingservice.security.JwtAuthenticationFilter
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final static String NUMERIC_PATTER = "^\\d+$";
-
     private final UserDetailsService userDetailsService;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -61,13 +58,6 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .userDetailsService(userDetailsService)
-                .build();
-    }
-
-    @Bean
-    static RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("ADMIN").implies("USER")
                 .build();
     }
 

@@ -23,7 +23,7 @@ import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationS
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
-import mate.academy.accommodationbookingservice.service.accomodation.AccommodationService;
+import mate.academy.accommodationbookingservice.service.accommodation.AccommodationService;
 
 @Tag(
         name = "Accommodations",
@@ -45,20 +45,20 @@ public class AccommodationController {
 
     @Operation(summary = "Select all accommodations")
     @GetMapping
-    public Page<AccommodationShortResponseDto> findAllAccommodation(Pageable pageable) {
+    public Page<AccommodationShortResponseDto> findAccommodationAll(Pageable pageable) {
         return accommodationService.findAll(pageable);
     }
 
     @Operation(summary = "Select single accommodation by ID")
     @GetMapping("/{id}")
-    public AccommodationResponseDto findByIdAccommodation(@PathVariable Long id) {
+    public AccommodationResponseDto findAccommodationById(@PathVariable Long id) {
         return accommodationService.findById(id);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update single accommodation by ID")
     @PutMapping("/{id}")
-    public AccommodationResponseDto updateByIdAccommodation(
+    public AccommodationResponseDto updateAccommodationById(
             @PathVariable Long id,
             @RequestBody @Valid AccommodationUpdateRequestDto request) {
         return accommodationService.updateById(id, request);
@@ -67,7 +67,7 @@ public class AccommodationController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Patch single accommodation by ID")
     @PatchMapping("/{id}")
-    public AccommodationResponseDto patchByIdAccommodation(
+    public AccommodationResponseDto patchAccommodationById(
             @PathVariable Long id,
             @RequestBody @Valid AccommodationPatchRequestDto request) {
         return accommodationService.patchById(id, request);

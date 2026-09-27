@@ -25,9 +25,9 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "accommodations")
 @SQLDelete(sql = "UPDATE accommodations SET is_deleted=true WHERE id = ?")
 @SQLRestriction("is_deleted <> true")
+@Table(name = "accommodations")
 public class Accommodation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

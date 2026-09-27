@@ -33,7 +33,7 @@ public class UserController {
             + "change role by ID for ADMIN user")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/role")
-    public UserResponseDto updateRoles(
+    public UserResponseDto updateUserRoles(
             @PathVariable Long id,
             @RequestBody @Valid UserRolesUpdateDto request
     ) {
@@ -43,7 +43,7 @@ public class UserController {
     @Operation(description = "Give user opportunity to check about themself")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     @GetMapping("/me")
-    public UserResponseDto getDetails(Authentication authentication) {
+    public UserResponseDto getUserDetailsByAuth(Authentication authentication) {
         return userService.getUserDetails(authentication);
     }
 
@@ -51,7 +51,7 @@ public class UserController {
             + " and full information about themself. All fields requires")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     @PutMapping("/me")
-    public UserResponseDto updateDetails(
+    public UserResponseDto updateUserDetailsById(
             Authentication authentication,
             @RequestBody @Valid UserUpdateRequestDto request
     ) {
@@ -62,7 +62,7 @@ public class UserController {
             + " and full information about themself. Any fields can be changed separately")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     @PatchMapping("/me")
-    public UserResponseDto patchDetails(
+    public UserResponseDto patchUserDetailsById(
             Authentication authentication,
             @RequestBody @Valid UserPatchRequestDto request
     ) {
