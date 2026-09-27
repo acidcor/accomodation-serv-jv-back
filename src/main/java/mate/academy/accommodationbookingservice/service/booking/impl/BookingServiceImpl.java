@@ -3,24 +3,29 @@ package mate.academy.accommodationbookingservice.service.booking.impl;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import mate.academy.accommodationbookingservice.dto.SearchParamDto;
 import mate.academy.accommodationbookingservice.dto.booking.BookingPatchUpdateRequestDto;
 import mate.academy.accommodationbookingservice.dto.booking.BookingRequestDto;
 import mate.academy.accommodationbookingservice.dto.booking.BookingResponseDto;
+import mate.academy.accommodationbookingservice.exception.BookingCancelingException;
 import mate.academy.accommodationbookingservice.exception.BookingDateException;
 import mate.academy.accommodationbookingservice.mapper.BookingMapper;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Booking;
 import mate.academy.accommodationbookingservice.model.BookingStatus;
+import mate.academy.accommodationbookingservice.model.Role;
 import mate.academy.accommodationbookingservice.model.User;
 import mate.academy.accommodationbookingservice.repository.AccommodationRepository;
 import mate.academy.accommodationbookingservice.repository.BookingRepository;
 import mate.academy.accommodationbookingservice.service.booking.BookingService;
+import mate.academy.accommodationbookingservice.service.specification.SpecificationBuilder;
 
 @RequiredArgsConstructor
 @Service
@@ -31,6 +36,8 @@ public class BookingServiceImpl implements BookingService {
     private final AccommodationRepository accommodationRepository;
 
     private final BookingMapper bookingMapper;
+
+    private final SpecificationBuilder<Booking> bookingSpecBuilder;
 
     @Override
     public BookingResponseDto save(BookingRequestDto request, Authentication authentication) {
@@ -68,6 +75,18 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto findById(Long id, Authentication authentication) {
         User user = getUserByAuth(authentication);
+        if (user.getRoles().stream()
+                .anyMatch(
+                        role -> role.getName() == Role.ADMIN
+                )
+        ) {
+            return bookingMapper.toDto(
+                    bookingRepository
+                            .findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Can't find booking with such ID: " + id)
+                            ));
+        }
         return bookingMapper.toDto(
                 bookingRepository
                         .findBookingByIdAndUser(id, user)
@@ -141,8 +160,23 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteById(Long id, Authentication authentication) {
-        bookingRepository.deleteBookingByIdAndUser(id, getUserByAuth(authentication));
+    public BookingResponseDto cancelBooking(Long id, Authentication authentication) {
+        Booking booking = bookingRepository
+                .findBookingByIdAndUser(id, getUserByAuth(authentication))
+                .orElseThrow(() -> new EntityNotFoundException(
+                                "Can't find booking with such ID: " + id)
+                );
+        if (booking.getStatus() == BookingStatus.CANCELED) {
+            throw new BookingCancelingException("Booking can't be canceled twice!");
+        }
+        booking.setStatus(BookingStatus.CANCELED);
+        return bookingMapper.toDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public Page<BookingResponseDto> findByIdAndStatus(SearchParamDto request, Pageable pageable) {
+        Specification<Booking> spec = bookingSpecBuilder.build(request);
+        return bookingRepository.findAll(spec, pageable).map(bookingMapper::toDto);
     }
 
     private void checkBooking(LocalDate checkIn, LocalDate checkOut, Accommodation accommodation) {

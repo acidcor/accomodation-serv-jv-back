@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import mate.academy.accommodationbookingservice.model.Accommodation;
@@ -13,7 +15,8 @@ import mate.academy.accommodationbookingservice.model.Booking;
 import mate.academy.accommodationbookingservice.model.User;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long>,
+        JpaSpecificationExecutor<Booking> {
     @Query("""
             SELECT COUNT(b) > 0
             FROM Booking b
@@ -41,11 +44,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             Long bookingId
     );
 
-    @EntityGraph(attributePaths = {"user", "accommodation"})
+    @EntityGraph(attributePaths = {"user",
+            "accommodation",
+            "accommodation.amenities",
+            "accommodation.location"})
     Page<Booking> findBookingsByUser(User user, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "accommodation"})
+    @EntityGraph(attributePaths = {"user",
+            "accommodation",
+            "accommodation.amenities",
+            "accommodation.location"})
     Optional<Booking> findBookingByIdAndUser(Long id, User user);
 
-    void deleteBookingByIdAndUser(Long id, User userByAuth);
+    @EntityGraph(attributePaths = {"user",
+            "accommodation",
+            "accommodation.amenities",
+            "accommodation.location"})
+    Page<Booking> findAll(Specification<Booking> spec, Pageable pageable);
 }
