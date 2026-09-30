@@ -58,7 +58,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
 
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-        booking.setStatus(BookingStatus.PROCESSING);
+        booking.setStatus(BookingStatus.AWAIT_PAYMENT);
 
         return bookingMapper.toDto(bookingRepository.save(booking));
     }

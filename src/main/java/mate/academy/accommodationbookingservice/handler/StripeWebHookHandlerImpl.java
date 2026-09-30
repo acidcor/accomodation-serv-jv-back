@@ -1,6 +1,5 @@
 package mate.academy.accommodationbookingservice.handler;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.stripe.exception.SignatureVerificationException;
@@ -12,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import mate.academy.accommodationbookingservice.dto.stripe.StripeRequestDto;
 import mate.academy.accommodationbookingservice.exception.StripeDataObjectException;
 import mate.academy.accommodationbookingservice.exception.StripeEventException;
-import mate.academy.accommodationbookingservice.service.paymant.PaymentService;
+import mate.academy.accommodationbookingservice.service.payment.PaymentService;
 import mate.academy.accommodationbookingservice.service.stripe.StripeClientProvider;
 
 @RequiredArgsConstructor
@@ -27,8 +26,9 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
 
     @Override
     public void handle(String payload, String signature) {
-        Event event = Event.GSON.fromJson(payload, Event.class);
-        if (endpointSecret != null && signature != null) {
+        Event event = null;
+        if (endpointSecret != null && !endpointSecret.isEmpty()
+                && signature != null && !signature.isEmpty()) {
             try {
                 event = clientProvider
                         .getClient()
@@ -37,9 +37,11 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
                         );
             } catch (SignatureVerificationException e) {
                 throw new StripeEventException(
-                        "Can't create an event thrue signatire verification"
+                        "Can't create an event through signature verification"
                 );
             }
+        } else {
+            event = Event.GSON.fromJson(payload, Event.class);
         }
         if (event == null) {
             throw new StripeEventException("Event object can't be null");
@@ -61,19 +63,13 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
         }
     }
 
-    private static @Nullable StripeObject getStripeObject(Event event) {
+    private static StripeObject getStripeObject(Event event) {
         EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-        StripeObject stripeObject = null;
-        if (dataObjectDeserializer
+        return dataObjectDeserializer
                 .getObject()
-                .isPresent()) {
-            stripeObject = dataObjectDeserializer
-                    .getObject()
-                    .orElseThrow(() -> new StripeDataObjectException(
-                            "Can't deserialize a strip object due to version incompatibility"
-                    ));
-        }
-        return stripeObject;
+                .orElseThrow(() -> new StripeDataObjectException(
+                        "Can't deserialize a stripe object due to version incompatibility"
+                ));
     }
 
     private void completeHandler(StripeObject stripeObject) {

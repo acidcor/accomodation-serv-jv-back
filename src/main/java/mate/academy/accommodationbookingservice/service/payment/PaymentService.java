@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.service.paymant;
+package mate.academy.accommodationbookingservice.service.payment;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ public interface PaymentService {
     PaymentRedirectionResponse initPayment(
             PaymentRequestDto request, Authentication authentication);
 
-    Page<PaymentResponseDto> finaAll(Authentication authentication, Pageable pageable);
+    Page<PaymentResponseDto> findAll(Authentication authentication, Pageable pageable);
 
     PaymentResponseDto getSuccess(Authentication authentication, String sessionId);
 
@@ -21,4 +21,8 @@ public interface PaymentService {
     void handleStripeCompleteRequest(StripeRequestDto requestDto);
 
     void handleStripeExpiredRequest(StripeRequestDto requestDto);
+
+    void syncPayment(Long id);
+
+    void syncPayments();
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentResponseDto;
-import mate.academy.accommodationbookingservice.service.paymant.PaymentService;
+import mate.academy.accommodationbookingservice.service.payment.PaymentService;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,9 +25,9 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'ADMIN')")
-    @GetMapping("/")
+    @GetMapping
     public Page<PaymentResponseDto> findAll(Authentication authentication, Pageable pageable) {
-        return paymentService.finaAll(authentication, pageable);
+        return paymentService.findAll(authentication, pageable);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER')")
@@ -37,8 +38,20 @@ public class PaymentController {
         return paymentService.initPayment(request, authentication);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/{id}/sync")
+    public void syncPayment(@PathVariable Long id) {
+        paymentService.syncPayment(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/all/sync")
+    public void syncAllPayments() {
+        paymentService.syncPayments();
+    }
+
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    @GetMapping("/success/")
+    @GetMapping("/success")
     public PaymentResponseDto successPayment(
             Authentication authentication,
             @RequestParam(name = "session_id") String sessionId
@@ -47,10 +60,10 @@ public class PaymentController {
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    @GetMapping("/cancel/")
+    @GetMapping("/cancel")
     public PaymentResponseDto cancelPayment(
             Authentication authentication,
-            @RequestParam(name = "session_id") @RequestBody String sessionId
+            @RequestParam(name = "session_id") String sessionId
     ) {
         return paymentService.getCancel(authentication, sessionId);
     }
