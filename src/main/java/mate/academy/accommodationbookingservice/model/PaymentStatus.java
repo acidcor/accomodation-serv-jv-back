@@ -1,8 +1,7 @@
 package mate.academy.accommodationbookingservice.model;
 
-public enum BookingStatus {
+public enum PaymentStatus {
     AWAIT_PAYMENT,
-    CONFIRMED,
-    CANCELED,
+    PAID,
     EXPIRED
 }

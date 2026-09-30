@@ -3,6 +3,7 @@ package mate.academy.accommodationbookingservice.model;
 import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,25 +27,23 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @Column(nullable = false)
     private LocalDate checkIn;
-    @NotNull
+    @Column(nullable = false)
     private LocalDate checkOut;
-    @NotNull
     @ManyToOne(
             fetch = FetchType.LAZY
     )
     @JoinColumn(nullable = false)
     private Accommodation accommodation;
-    @NotNull
     @ManyToOne(
             fetch = FetchType.LAZY
     )
     @JoinColumn(nullable = false)
     private User user;
-    @NotNull
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private BookingStatus status;
-    @NotNull
+    @Column(nullable = false)
     private boolean isDeleted = false;
 }

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,13 +23,14 @@ import mate.academy.accommodationbookingservice.model.Role;
 import mate.academy.accommodationbookingservice.model.User;
 import mate.academy.accommodationbookingservice.repository.AccommodationRepository;
 import mate.academy.accommodationbookingservice.repository.BookingRepository;
+import mate.academy.accommodationbookingservice.service.AuthenticatedUserProvider;
 import mate.academy.accommodationbookingservice.service.booking.BookingService;
 import mate.academy.accommodationbookingservice.service.specification.SpecificationBuilder;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class BookingServiceImpl implements BookingService {
+public class BookingServiceImpl implements BookingService, AuthenticatedUserProvider {
     private final BookingRepository bookingRepository;
 
     private final AccommodationRepository accommodationRepository;
@@ -53,12 +53,12 @@ public class BookingServiceImpl implements BookingService {
         checkDates(checkIn, checkOut);
         checkBooking(checkIn, checkOut, accommodation);
 
-        User user = getUserByAuth(authentication);
+        User user = getUserFromAuth(authentication);
         Booking booking = bookingMapper.toEntity(request);
 
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-        booking.setStatus(BookingStatus.PROCESSING);
+        booking.setStatus(BookingStatus.AWAIT_PAYMENT);
 
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Page<BookingResponseDto> findAll(Authentication authentication, Pageable pageable) {
         Page<Booking> bookings = bookingRepository.findBookingsByUser(
-                getUserByAuth(authentication),
+                getUserFromAuth(authentication),
                 pageable
         );
         return bookings.map(bookingMapper::toDto);
@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto findById(Long id, Authentication authentication) {
-        User user = getUserByAuth(authentication);
+        User user = getUserFromAuth(authentication);
         if (user.getRoles().stream()
                 .anyMatch(
                         role -> role.getName() == Role.ADMIN
@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository
                 .findBookingByIdAndUser(
                         id,
-                        getUserByAuth(authentication)
+                        getUserFromAuth(authentication)
                 )
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find booking with such ID: " + id)
@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository
                 .findBookingByIdAndUser(
                         id,
-                        getUserByAuth(authentication)
+                        getUserFromAuth(authentication)
                 )
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find booking with such ID: " + id)
@@ -162,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto cancelBooking(Long id, Authentication authentication) {
         Booking booking = bookingRepository
-                .findBookingByIdAndUser(id, getUserByAuth(authentication))
+                .findBookingByIdAndUser(id, getUserFromAuth(authentication))
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Can't find booking with such ID: " + id)
                 );
@@ -228,16 +228,5 @@ public class BookingServiceImpl implements BookingService {
         if (checkIn.isBefore(LocalDate.now())) {
             throw new BookingDateException("Check in date can't be before current date!");
         }
-    }
-
-    private User getUserByAuth(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (user == null) {
-            throw new UsernameNotFoundException(
-                    "Can't find user with such email: "
-                            + authentication.getName()
-            );
-        }
-        return user;
     }
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,12 +23,13 @@ import mate.academy.accommodationbookingservice.model.RoleEntity;
 import mate.academy.accommodationbookingservice.model.User;
 import mate.academy.accommodationbookingservice.repository.RoleRepository;
 import mate.academy.accommodationbookingservice.repository.UserRepository;
+import mate.academy.accommodationbookingservice.service.AuthenticatedUserProvider;
 import mate.academy.accommodationbookingservice.service.user.UserService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, AuthenticatedUserProvider {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
@@ -80,14 +80,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUserDetails(Authentication authentication) {
-        return userMapper.toDto(getUserByAuth(authentication));
+        return userMapper.toDto(getUserFromAuth(authentication));
     }
 
     @Override
     public UserResponseDto updateUserDetails(
             Authentication authentication,
             UserUpdateRequestDto request) {
-        User user = getUserByAuth(authentication);
+        User user = getUserFromAuth(authentication);
         String requestEmail = request.getEmail();
         String currentEmail = user.getEmail();
         checkEmail(requestEmail, currentEmail);
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto patchUserDetails(
             Authentication authentication,
             UserPatchRequestDto request) {
-        User user = getUserByAuth(authentication);
+        User user = getUserFromAuth(authentication);
         String requestEmail = request.getEmail();
         if (requestEmail != null) {
             String currentEmail = user.getEmail();
@@ -125,17 +125,6 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .filter(id -> !foundIds.contains(id))
                 .collect(Collectors.toSet());
-    }
-
-    private User getUserByAuth(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        if (user == null) {
-            throw new UsernameNotFoundException(
-                    "Can't find user with such email: "
-                            + authentication.getName()
-            );
-        }
-        return user;
     }
 
     private UserResponseDto getResponseDto(User user, String rawPass) {
