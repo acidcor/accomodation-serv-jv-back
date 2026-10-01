@@ -182,6 +182,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
                 paymentRepository.save(payment);
             } catch (Exception e) {
                 // Continue syncing other payments if one fails
+                // Somehow need to log #TODO
             }
         }
     }
