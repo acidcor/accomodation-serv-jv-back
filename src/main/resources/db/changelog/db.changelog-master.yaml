@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/changes/11-create-booking-table.yaml
   - include:
       file: db/changelog/changes/12-create-payments-table.yaml
+  - include:
+      file: db/changelog/changes/13-create-telegram-chat-table.yaml
