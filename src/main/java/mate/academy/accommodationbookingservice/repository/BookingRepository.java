@@ -1,6 +1,7 @@
 package mate.academy.accommodationbookingservice.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Booking;
+import mate.academy.accommodationbookingservice.model.BookingStatus;
 import mate.academy.accommodationbookingservice.model.User;
 
 @Repository
@@ -61,4 +63,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>,
             "accommodation.amenities",
             "accommodation.location"})
     Page<Booking> findAll(Specification<Booking> spec, Pageable pageable);
+
+    List<Booking> findBookingsByCheckOutLessThanEqualAndStatusNot(
+            LocalDate tomorrow,
+            BookingStatus bookingStatus
+    );
 }

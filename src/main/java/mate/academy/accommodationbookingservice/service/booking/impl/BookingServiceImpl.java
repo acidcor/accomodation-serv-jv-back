@@ -1,9 +1,11 @@
 package mate.academy.accommodationbookingservice.service.booking.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
@@ -75,7 +77,9 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
     @Override
     public BookingResponseDto findById(Long id, Authentication authentication) {
         User user = getUserFromAuth(authentication);
-        if (user.getRoles().stream()
+        if (user
+                .getRoles()
+                .stream()
                 .anyMatch(
                         role -> role.getName() == Role.ADMIN
                 )
@@ -164,7 +168,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
         Booking booking = bookingRepository
                 .findBookingByIdAndUser(id, getUserFromAuth(authentication))
                 .orElseThrow(() -> new EntityNotFoundException(
-                                "Can't find booking with such ID: " + id)
+                        "Can't find booking with such ID: " + id)
                 );
         if (booking.getStatus() == BookingStatus.CANCELED) {
             throw new BookingCancelingException("Booking can't be canceled twice!");
@@ -176,7 +180,25 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
     @Override
     public Page<BookingResponseDto> findByIdAndStatus(SearchParamDto request, Pageable pageable) {
         Specification<Booking> spec = bookingSpecBuilder.build(request);
-        return bookingRepository.findAll(spec, pageable).map(bookingMapper::toDto);
+        return bookingRepository
+                .findAll(spec, pageable)
+                .map(bookingMapper::toDto);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void expireBookings() {
+        LocalDate tomorrow = LocalDate
+                .now()
+                .plusDays(1);
+        List<Booking> expiredBookings = bookingRepository
+                .findBookingsByCheckOutLessThanEqualAndStatusNot(
+                        tomorrow,
+                        BookingStatus.CANCELED
+                );
+        for (Booking booking : expiredBookings) {
+            booking.setStatus(BookingStatus.EXPIRED);
+        }
+        bookingRepository.saveAll(expiredBookings);
     }
 
     private void checkBooking(LocalDate checkIn, LocalDate checkOut, Accommodation accommodation) {
