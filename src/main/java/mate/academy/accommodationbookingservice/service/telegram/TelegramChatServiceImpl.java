@@ -1,7 +1,7 @@
 package mate.academy.accommodationbookingservice.service.telegram;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,7 @@ public class TelegramChatServiceImpl implements TelegramChatService {
 
     @Override
     public List<TelegramChat> getSubscribedInner() {
-        return telegramChatRepository.findTelegramChatsByIsSubscribed(true).stream().collect(
-                Collectors.toList());
+        return new ArrayList<>(telegramChatRepository.findTelegramChatsByIsSubscribed(true));
     }
 
     @Override

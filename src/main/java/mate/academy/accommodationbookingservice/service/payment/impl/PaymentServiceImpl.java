@@ -31,6 +31,7 @@ import mate.academy.accommodationbookingservice.repository.PaymentRepository;
 import mate.academy.accommodationbookingservice.service.AuthenticatedUserProvider;
 import mate.academy.accommodationbookingservice.service.payment.PaymentService;
 import mate.academy.accommodationbookingservice.service.stripe.StripeService;
+import mate.academy.accommodationbookingservice.service.telegram.NotificationService;
 
 @Slf4j
 @Service
@@ -56,6 +57,8 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
     private final PaymentMapper paymentMapper;
 
     private final PaymentRepository paymentRepository;
+
+    private final NotificationService notificationService;
 
     @Override
     public Page<PaymentResponseDto> findAll(Authentication authentication, Pageable pageable) {
@@ -148,7 +151,8 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
             Booking booking = payment.getBooking();
             booking.setStatus(BookingStatus.CONFIRMED);
             bookingRepository.save(booking);
-            paymentRepository.save(payment);
+            Payment confirmed = paymentRepository.save(payment);
+            notificationService.sendPaymentConfirmed(confirmed);
         }
     }
 
@@ -160,7 +164,8 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by session Id: " + sessionId));
         payment.setStatus(PaymentStatus.EXPIRED);
-        paymentRepository.save(payment);
+        Payment expired = paymentRepository.save(payment);
+        notificationService.sendPaymentExpired(expired);
     }
 
     @Override
