@@ -9,16 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbookingservice.dto.payment.PaymentResponseDto;
 import mate.academy.accommodationbookingservice.dto.stripe.StripeRequestDto;
-import mate.academy.accommodationbookingservice.exception.PaymentInitializationException;
-import mate.academy.accommodationbookingservice.exception.PaymentNotFoundException;
-import mate.academy.accommodationbookingservice.exception.PaymentSessionException;
+import mate.academy.accommodationbookingservice.exception.notfound.EntityNotFoundException;
+import mate.academy.accommodationbookingservice.exception.stripe.PaymentSessionException;
+import mate.academy.accommodationbookingservice.exception.validation.PaymentInitializationException;
 import mate.academy.accommodationbookingservice.mapper.PaymentMapper;
 import mate.academy.accommodationbookingservice.model.Booking;
 import mate.academy.accommodationbookingservice.model.BookingStatus;
@@ -32,6 +32,7 @@ import mate.academy.accommodationbookingservice.service.AuthenticatedUserProvide
 import mate.academy.accommodationbookingservice.service.payment.PaymentService;
 import mate.academy.accommodationbookingservice.service.stripe.StripeService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -97,7 +98,9 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         try {
             session = stripeService.getBookingCheckOutSession(amount);
         } catch (StripeException e) {
-            throw new RuntimeException(e);
+            throw new PaymentInitializationException(
+                    "Failed to create payment session for booking ID: " + bookingId
+            );
         }
         Payment payment = new Payment();
         payment.setBooking(booking);
@@ -115,7 +118,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         User user = getUserFromAuth(authentication);
         Payment payment = paymentRepository
                 .findPaymentBySessionIdAndBookingUser(sessionId, user)
-                .orElseThrow(() -> new PaymentNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by Id: " + sessionId)
                 );
         return paymentMapper.toDto(payment);
@@ -126,7 +129,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         User user = getUserFromAuth(authentication);
         Payment payment = paymentRepository
                 .findPaymentBySessionIdAndBookingUser(sessionId, user)
-                .orElseThrow(() -> new PaymentNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by Id: " + sessionId)
                 );
         return paymentMapper.toDto(payment);
@@ -137,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         String sessionId = requestDto.getId();
         Payment payment = paymentRepository
                 .findPaymentBySessionId(sessionId)
-                .orElseThrow(() -> new PaymentNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by Id: " + sessionId));
         String status = requestDto.getStatus();
         if (SESSION_PAYMENT_PAID.equals(status)) {
@@ -154,7 +157,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         String sessionId = requestDto.getId();
         Payment payment = paymentRepository
                 .findPaymentBySessionId(sessionId)
-                .orElseThrow(() -> new PaymentNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by session Id: " + sessionId));
         payment.setStatus(PaymentStatus.EXPIRED);
         paymentRepository.save(payment);
@@ -165,7 +168,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         Payment payment = paymentRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new PaymentNotFoundException(
+                        () -> new EntityNotFoundException(
                                 "Can't find payment by Id: " + id)
                 );
         syncStatus(payment);
@@ -181,8 +184,7 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
                 syncStatus(payment);
                 paymentRepository.save(payment);
             } catch (Exception e) {
-                // Continue syncing other payments if one fails
-                // Somehow need to log #TODO
+                log.error("Failed to synchronize payment: {}", String.valueOf(e));
             }
         }
     }

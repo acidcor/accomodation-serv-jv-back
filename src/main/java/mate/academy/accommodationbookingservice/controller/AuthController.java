@@ -12,7 +12,7 @@ import mate.academy.accommodationbookingservice.dto.user.UserResponseDto;
 import mate.academy.accommodationbookingservice.dto.user.auth.UserLoginRequestDto;
 import mate.academy.accommodationbookingservice.dto.user.auth.UserLoginResponseDto;
 import mate.academy.accommodationbookingservice.dto.user.auth.UserRegisterRequestDto;
-import mate.academy.accommodationbookingservice.exception.RegistrationException;
+import mate.academy.accommodationbookingservice.exception.validation.RegistrationException;
 import mate.academy.accommodationbookingservice.security.AuthenticationService;
 import mate.academy.accommodationbookingservice.service.user.UserService;
 

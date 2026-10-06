@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationResponseDto;
@@ -13,6 +12,7 @@ import mate.academy.accommodationbookingservice.dto.accomnodation.AccommodationS
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationPatchRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationRequestDto;
 import mate.academy.accommodationbookingservice.dto.accomnodation.crud.AccommodationUpdateRequestDto;
+import mate.academy.accommodationbookingservice.exception.notfound.EntityNotFoundException;
 import mate.academy.accommodationbookingservice.mapper.AccommodationMapper;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Amenity;
