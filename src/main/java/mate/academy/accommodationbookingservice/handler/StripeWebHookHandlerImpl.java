@@ -9,8 +9,8 @@ import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import mate.academy.accommodationbookingservice.dto.stripe.StripeRequestDto;
-import mate.academy.accommodationbookingservice.exception.StripeDataObjectException;
-import mate.academy.accommodationbookingservice.exception.StripeEventException;
+import mate.academy.accommodationbookingservice.exception.stripe.StripeDataObjectException;
+import mate.academy.accommodationbookingservice.exception.stripe.StripeEventException;
 import mate.academy.accommodationbookingservice.service.payment.PaymentService;
 import mate.academy.accommodationbookingservice.service.stripe.StripeClientProvider;
 

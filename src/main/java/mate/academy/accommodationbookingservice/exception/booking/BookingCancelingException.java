@@ -1,4 +1,4 @@
-package mate.academy.accommodationbookingservice.exception;
+package mate.academy.accommodationbookingservice.exception.booking;
 
 public class BookingCancelingException extends RuntimeException {
     public BookingCancelingException(String message) {

@@ -3,7 +3,7 @@ package mate.academy.accommodationbookingservice.service.specification.user;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import mate.academy.accommodationbookingservice.exception.SpecificationProviderNotFoundException;
+import mate.academy.accommodationbookingservice.exception.notfound.SpecificationProviderNotFoundException;
 import mate.academy.accommodationbookingservice.model.Booking;
 import mate.academy.accommodationbookingservice.service.specification.SpecificationProvider;
 import mate.academy.accommodationbookingservice.service.specification.SpecificationProviderManager;

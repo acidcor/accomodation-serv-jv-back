@@ -9,7 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import mate.academy.accommodationbookingservice.dto.telegram.TelegramChatRequestDto;
 import mate.academy.accommodationbookingservice.dto.telegram.TelegramChatResponseDto;
-import mate.academy.accommodationbookingservice.exception.TelegramChatNotFoundException;
+import mate.academy.accommodationbookingservice.exception.notfound.EntityNotFoundException;
 import mate.academy.accommodationbookingservice.mapper.TelegramChatMapper;
 import mate.academy.accommodationbookingservice.model.TelegramChat;
 import mate.academy.accommodationbookingservice.repository.TelegramChatRepository;
@@ -41,7 +41,7 @@ public class TelegramChatServiceImpl implements TelegramChatService {
     @Override
     public TelegramChatResponseDto changeSubscriptionById(Long id) {
         TelegramChat chat = telegramChatRepository.findById(id).orElseThrow(() ->
-                new TelegramChatNotFoundException("Can't find telegram chat by Id: " + id)
+                new EntityNotFoundException("Can't find telegram chat by Id: " + id)
         );
         chat.setSubscribed(!chat.isSubscribed());
         return telegramChatMapper.toDto(telegramChatRepository.save(chat));

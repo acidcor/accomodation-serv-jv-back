@@ -6,7 +6,7 @@ import mate.academy.accommodationbookingservice.dto.user.auth.UserRegisterReques
 import mate.academy.accommodationbookingservice.dto.user.crud.UserPatchRequestDto;
 import mate.academy.accommodationbookingservice.dto.user.crud.UserRolesUpdateDto;
 import mate.academy.accommodationbookingservice.dto.user.crud.UserUpdateRequestDto;
-import mate.academy.accommodationbookingservice.exception.RegistrationException;
+import mate.academy.accommodationbookingservice.exception.validation.RegistrationException;
 
 public interface UserService {
     UserResponseDto register(UserRegisterRequestDto request) throws RegistrationException;

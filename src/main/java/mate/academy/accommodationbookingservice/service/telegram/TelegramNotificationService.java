@@ -39,7 +39,7 @@ public class TelegramNotificationService implements NotificationService {
                 try {
                     addChatToDb(update);
                 } catch (Exception e) {
-                    // #TODO Add logger
+                    log.error("Failed to process Telegram update", e);
                 }
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
