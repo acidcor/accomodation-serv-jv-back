@@ -28,12 +28,15 @@ import mate.academy.accommodationbookingservice.repository.BookingRepository;
 import mate.academy.accommodationbookingservice.service.AuthenticatedUserProvider;
 import mate.academy.accommodationbookingservice.service.booking.BookingService;
 import mate.academy.accommodationbookingservice.service.specification.SpecificationBuilder;
+import mate.academy.accommodationbookingservice.service.telegram.TelegramNotificationService;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService, AuthenticatedUserProvider {
     private final BookingRepository bookingRepository;
+
+    private final TelegramNotificationService notificationService;
 
     private final AccommodationRepository accommodationRepository;
 
@@ -61,8 +64,9 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
         booking.setUser(user);
         booking.setAccommodation(accommodation);
         booking.setStatus(BookingStatus.AWAIT_PAYMENT);
-
-        return bookingMapper.toDto(bookingRepository.save(booking));
+        BookingResponseDto dto = bookingMapper.toDto(bookingRepository.save(booking));
+        notificationService.sendBookingCreated(dto);
+        return dto;
     }
 
     @Override
@@ -174,7 +178,9 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
             throw new BookingCancelingException("Booking can't be canceled twice!");
         }
         booking.setStatus(BookingStatus.CANCELED);
-        return bookingMapper.toDto(bookingRepository.save(booking));
+        BookingResponseDto dto = bookingMapper.toDto(bookingRepository.save(booking));
+        notificationService.sendBookingCanceled(dto);
+        return dto;
     }
 
     @Override
@@ -198,7 +204,25 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
         for (Booking booking : expiredBookings) {
             booking.setStatus(BookingStatus.EXPIRED);
         }
-        bookingRepository.saveAll(expiredBookings);
+        List<Booking> bookings = bookingRepository.saveAll(expiredBookings);
+
+        for (Booking booking : bookings) {
+            notificationService.sendBookingExpired(bookingMapper.toDto(booking));
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void realisedBookings() {
+        LocalDate tomorrow = LocalDate
+                .now();
+        List<Booking> realised = bookingRepository
+                .findBookingsByCheckOutLessThanEqualAndStatusNot(
+                        tomorrow,
+                        BookingStatus.CONFIRMED
+                );
+        for (Booking booking : realised) {
+            notificationService.sendBookingReleased(bookingMapper.toDto(booking));
+        }
     }
 
     private void checkBooking(LocalDate checkIn, LocalDate checkOut, Accommodation accommodation) {
