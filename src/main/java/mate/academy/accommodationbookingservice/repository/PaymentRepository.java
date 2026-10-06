@@ -29,5 +29,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findPaymentsByStatus(PaymentStatus status);
 
     @EntityGraph(attributePaths = {"booking", "booking.user"})
-    boolean existsPaymentByBooking_UserAndStatus_AwaitPayment(User user);
+    boolean existsPaymentByBookingUserAndStatus(User user, PaymentStatus status);
 }

@@ -79,7 +79,10 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
             Authentication authentication
     ) {
         User user = getUserFromAuth(authentication);
-        if (paymentRepository.existsPaymentByBooking_UserAndStatus_AwaitPayment(user)) {
+        if (paymentRepository.existsPaymentByBookingUserAndStatus(
+                user,
+                PaymentStatus.AWAIT_PAYMENT)
+        ) {
             throw new PaymentInitializationException(String.format(
                     "User %s can't create a payment while another payment is still in progress",
                     user.getEmail())
