@@ -38,6 +38,7 @@ import mate.academy.accommodationbooking.service.repository.BookingRepository;
 import mate.academy.accommodationbooking.service.repository.PaymentRepository;
 import mate.academy.accommodationbooking.service.service.payment.impl.PaymentServiceImpl;
 import mate.academy.accommodationbooking.service.service.stripe.StripeService;
+import mate.academy.accommodationbooking.service.service.telegram.NotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +77,8 @@ class PaymentServiceImplTest {
     private Authentication authentication;
     @Mock
     private Session session;
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
@@ -322,6 +325,7 @@ class PaymentServiceImplTest {
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
         given(paymentRepository.findPaymentBySessionId(SESSION_ID))
                 .willReturn(Optional.of(payment));
+        given(paymentRepository.save(payment)).willReturn(payment);
 
         // when
         paymentService.handleStripeCompleteRequest(buildStripeRequest("paid"));
@@ -331,6 +335,7 @@ class PaymentServiceImplTest {
         assertEquals(BookingStatus.CONFIRMED, payment.getBooking().getStatus());
         then(bookingRepository).should().save(payment.getBooking());
         then(paymentRepository).should().save(payment);
+        then(notificationService).should().sendPaymentConfirmed(payment);
     }
 
     @Test
@@ -373,13 +378,16 @@ class PaymentServiceImplTest {
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
         given(paymentRepository.findPaymentBySessionId(SESSION_ID))
                 .willReturn(Optional.of(payment));
+        given(paymentRepository.save(payment)).willReturn(payment);
 
         // when
         paymentService.handleStripeExpiredRequest(buildStripeRequest("expired"));
 
         // then
+        // then
         assertEquals(PaymentStatus.EXPIRED, payment.getStatus());
         then(paymentRepository).should().save(payment);
+        then(notificationService).should().sendPaymentExpired(payment);
     }
 
     @Test
