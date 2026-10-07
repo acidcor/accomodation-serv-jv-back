@@ -68,4 +68,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long>,
             LocalDate tomorrow,
             BookingStatus bookingStatus
     );
+
+    boolean existsBookingByUser_IdAndStatus(Long userId, BookingStatus status);
 }
