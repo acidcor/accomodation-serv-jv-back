@@ -48,7 +48,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
     @Override
     public BookingResponseDto save(BookingRequestDto request, Authentication authentication) {
         User user = getUserFromAuth(authentication);
-        if (bookingRepository.existsBookingByUser_IdAndStatus(user.getId()
+        if (bookingRepository.existsBookingByUserIdAndStatus(user.getId()
                 , BookingStatus.AWAIT_PAYMENT)) {
             throw new BookingStatusRestriction(
                     "Can't create a booking while another payment is pending"
