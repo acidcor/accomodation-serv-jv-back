@@ -38,6 +38,14 @@ public class PaymentController {
         return paymentService.initPayment(request, authentication);
     }
 
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PostMapping("/{id}/")
+    public PaymentRedirectionResponse renewPayment(
+            @PathVariable Long id,
+            Authentication authentication) {
+        return paymentService.renewPayment(id, authentication);
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{id}/sync")
     public void syncPayment(@PathVariable Long id) {

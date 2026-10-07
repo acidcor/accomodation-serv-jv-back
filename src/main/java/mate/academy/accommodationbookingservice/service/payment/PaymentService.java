@@ -25,4 +25,6 @@ public interface PaymentService {
     void syncPayment(Long id);
 
     void syncPayments();
+
+    PaymentRedirectionResponse renewPayment(Long request, Authentication authentication);
 }
