@@ -79,15 +79,6 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
             Authentication authentication
     ) {
         User user = getUserFromAuth(authentication);
-        if (paymentRepository.existsPaymentByBookingUserAndStatus(
-                user,
-                PaymentStatus.AWAIT_PAYMENT)
-        ) {
-            throw new PaymentInitializationException(String.format(
-                    "User %s can't create a payment while another payment is still in progress",
-                    user.getEmail())
-            );
-        }
         Long bookingId = request.getBookingId();
         Booking booking = bookingRepository
                 .findBookingByIdAndUser(bookingId, user)
@@ -109,6 +100,12 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
         } catch (StripeException e) {
             throw new PaymentInitializationException(
                     "Failed to create payment session for booking ID: " + bookingId
+            );
+        }
+        if (session == null) {
+            throw new PaymentInitializationException(
+                    "Failed to create payment session for booking ID: "
+                            + bookingId
             );
         }
         Payment payment = new Payment();
@@ -196,6 +193,45 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
                 log.error("Failed to synchronize payment: {}", String.valueOf(e));
             }
         }
+    }
+
+    @Override
+    public PaymentRedirectionResponse renewPayment(
+            Long id,
+            Authentication authentication) {
+        User user = getUserFromAuth(authentication);
+        Payment payment = paymentRepository
+                .findByIdAndBookingUser(id, user)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Can't find payment by ID '%s' related to user: %s",
+                                id, user.getEmail()))
+                );
+        if (payment.getStatus() != PaymentStatus.EXPIRED
+                && payment.getStatus() != PaymentStatus.AWAIT_PAYMENT) {
+            throw new PaymentInitializationException(
+                    "Can't renew payment with status: " + payment.getStatus());
+        }
+        BigDecimal amount = payment.getAmount();
+        Long bookingId = payment.getBooking().getId();
+        Session session = null;
+        try {
+            session = stripeService.getBookingCheckOutSession(amount);
+        } catch (StripeException e) {
+            throw new PaymentInitializationException(
+                    "Failed to create payment session for booking ID: "
+                            + bookingId
+            );
+        }
+        if (session == null) {
+            throw new PaymentInitializationException(
+                    "Failed to create payment session for booking ID: "
+                            + bookingId
+            );
+        }
+        payment.setStatus(PaymentStatus.AWAIT_PAYMENT);
+        payment.setSessionUrl(session.getUrl());
+        payment.setSessionId(session.getId());
+        return paymentMapper.toRedirectDto(paymentRepository.save(payment));
     }
 
     private void syncStatus(Payment payment) {
