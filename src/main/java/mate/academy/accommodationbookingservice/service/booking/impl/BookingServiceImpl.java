@@ -17,6 +17,7 @@ import mate.academy.accommodationbookingservice.dto.booking.BookingResponseDto;
 import mate.academy.accommodationbookingservice.exception.booking.BookingCancelingException;
 import mate.academy.accommodationbookingservice.exception.notfound.EntityNotFoundException;
 import mate.academy.accommodationbookingservice.exception.validation.BookingDateException;
+import mate.academy.accommodationbookingservice.exception.validation.BookingStatusRestriction;
 import mate.academy.accommodationbookingservice.mapper.BookingMapper;
 import mate.academy.accommodationbookingservice.model.Accommodation;
 import mate.academy.accommodationbookingservice.model.Booking;
@@ -46,6 +47,13 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
 
     @Override
     public BookingResponseDto save(BookingRequestDto request, Authentication authentication) {
+        User user = getUserFromAuth(authentication);
+        if (bookingRepository.existsBookingByUserIdAndStatus(user.getId()
+                , BookingStatus.AWAIT_PAYMENT)) {
+            throw new BookingStatusRestriction(
+                    "Can't create a booking while another payment is pending"
+            );
+        }
         Long accommodationId = request.getAccommodation();
         Accommodation accommodation = accommodationRepository
                 .findById(accommodationId)
@@ -58,7 +66,6 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
         checkDates(checkIn, checkOut);
         checkBooking(checkIn, checkOut, accommodation);
 
-        User user = getUserFromAuth(authentication);
         Booking booking = bookingMapper.toEntity(request);
 
         booking.setUser(user);
