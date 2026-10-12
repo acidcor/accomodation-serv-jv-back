@@ -1,0 +1,1 @@
+INSERT INTO amenities (id, name, description) VALUES (1, "test", "test")

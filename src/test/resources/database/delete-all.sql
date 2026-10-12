@@ -1,0 +1,12 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE payments;
+TRUNCATE TABLE bookings;
+TRUNCATE TABLE accommodations_amenities;
+TRUNCATE TABLE accommodations;
+TRUNCATE TABLE addresses;
+TRUNCATE TABLE amenities;
+TRUNCATE TABLE users_roles;
+TRUNCATE TABLE users;
+
+SET FOREIGN_KEY_CHECKS = 1;
