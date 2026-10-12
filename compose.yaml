@@ -1,19 +1,20 @@
 services:
   mariadb:
-    image: 'mariadb:latest'
+    image: mariadb:latest
     restart: unless-stopped
     env_file:
       - ./.env
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
-      MYSQL_DATABASE: ${DB_URL}
+      MARIADB_ROOT_PASSWORD: ${DB_PASS}
+      MARIADB_DATABASE: ${DB_NAME}
     ports:
       - "${DB_LOCAL_PORT}:${DB_DOCKER_PORT}"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_PASS}"]
-      interval: 15s
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   app:
     depends_on:

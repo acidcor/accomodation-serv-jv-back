@@ -1,0 +1,2 @@
+INSERT INTO addresses (street_line_one, street_line_two, postal_code, city, region, room_number, latitude, longitude)
+VALUES ('Main Street 10', 'Building A', '00-001', 'Warsaw', 'Masovian', '101', 52.2297, 21.0122);
