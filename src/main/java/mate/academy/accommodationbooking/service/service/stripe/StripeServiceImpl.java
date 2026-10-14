@@ -23,7 +23,8 @@ public class StripeServiceImpl implements StripeService {
     private final static String ID_PARAM_PLACEHOLDER = "{CHECKOUT_SESSION_ID}";
     private final static String ITEM_NAME = "Booking";
     private final static String BASE_CURRENCY = "USD";
-    public static final int HOURS_TO_EXPIRE = 24;
+    @Value("${stripe.payment.expiring_hour}")
+    private int expireHours;
     private final static BigDecimal CENT_MULTIPLIER = BigDecimal.valueOf(100);
     private final StripeClientProvider clientProvider;
 
@@ -57,7 +58,7 @@ public class StripeServiceImpl implements StripeService {
                 .toUriString();
         long expirationDate = Instant
                 .now()
-                .plus(HOURS_TO_EXPIRE, ChronoUnit.HOURS)
+                .plus(expireHours, ChronoUnit.HOURS)
                 .getEpochSecond();
         SessionCreateParams params = SessionCreateParams.builder()
                         .addLineItem(

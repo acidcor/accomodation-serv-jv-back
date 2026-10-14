@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import mate.academy.accommodationbooking.service.dto.payment.PaymentCancelingResponseDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentResponseDto;
@@ -279,7 +280,8 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Get cancel: returns the payment DTO found by session ID for the user")
+    @DisplayName("Get cancel: returns the payment closing DTO found by "
+            + "session ID for the user with propper booking ID message")
     void getCancel_paymentExists_returnsDto() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -288,13 +290,12 @@ class PaymentServiceImplTest {
         givenAuthenticatedUser(user);
         given(paymentRepository.findPaymentBySessionIdAndBookingUser(SESSION_ID, user))
                 .willReturn(Optional.of(payment));
-        given(paymentMapper.toDto(payment)).willReturn(dto);
 
         // when
-        PaymentResponseDto actual = paymentService.getCancel(authentication, SESSION_ID);
+        PaymentCancelingResponseDto actual = paymentService.getCancel(authentication, SESSION_ID);
 
         // then
-        assertEquals(dto, actual);
+        assertTrue(actual.getMessage().contains(payment.getBooking().getId().toString()));
     }
 
     @Test

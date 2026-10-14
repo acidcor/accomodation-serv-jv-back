@@ -1,5 +1,6 @@
 package mate.academy.accommodationbooking.service.payment;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -484,18 +485,17 @@ class PaymentControllerTest {
     }
 
     @Test
-    @DisplayName("GET /payments/cancel: returns the payment of the customer's session")
+    @DisplayName("GET /payments/cancel: returns the massage of the customer's session with booking ID")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelPayment_ownSession_returnsPayment() throws Exception {
-        // given: session sess_c1 belongs to the customer's payment 4001
-
         // when
         ResultActions result = mockMvc.perform(get(CANCEL_URL).param("session_id", "sess_c1"));
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(AWAITING_PAYMENT_ID))
-                .andExpect(jsonPath("$.status").value("AWAIT_PAYMENT"));
+                .andExpect(jsonPath("$.message")
+                        .value(containsString(AWAITING_PAYMENT_ID.toString())));
+
     }
 
     @Test

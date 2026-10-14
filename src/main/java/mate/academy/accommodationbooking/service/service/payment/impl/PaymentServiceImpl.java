@@ -12,6 +12,7 @@ import com.stripe.model.checkout.Session;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mate.academy.accommodationbooking.service.dto.payment.PaymentCancelingResponseDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentResponseDto;
@@ -131,14 +132,19 @@ public class PaymentServiceImpl implements PaymentService, AuthenticatedUserProv
     }
 
     @Override
-    public PaymentResponseDto getCancel(Authentication authentication, String sessionId) {
+    public PaymentCancelingResponseDto getCancel(Authentication authentication, String sessionId) {
         User user = getUserFromAuth(authentication);
         Payment payment = paymentRepository
                 .findPaymentBySessionIdAndBookingUser(sessionId, user)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find payment by Id: " + sessionId)
                 );
-        return paymentMapper.toDto(payment);
+        String message = String.format("You were close the payment for booking %s,"
+                        + " but u can continue your payment for 24 hour after canceling!",
+                payment.getBooking().getId());
+        PaymentCancelingResponseDto responseDto = new PaymentCancelingResponseDto();
+        responseDto.setMessage(message);
+        return responseDto;
     }
 
     @Override

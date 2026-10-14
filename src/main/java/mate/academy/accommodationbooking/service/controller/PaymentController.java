@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mate.academy.accommodationbooking.service.dto.payment.PaymentCancelingResponseDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentResponseDto;
@@ -86,7 +87,7 @@ public class PaymentController {
             description = "Returns payment details for a canceled payment session.")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     @GetMapping("/cancel")
-    public PaymentResponseDto cancelPayment(
+    public PaymentCancelingResponseDto cancelPayment(
             Authentication authentication,
             @RequestParam(name = "session_id") String sessionId) {
         return paymentService.getCancel(authentication, sessionId);
