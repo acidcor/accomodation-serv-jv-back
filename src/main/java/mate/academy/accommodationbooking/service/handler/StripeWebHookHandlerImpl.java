@@ -27,21 +27,20 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
     @Override
     public void handle(String payload, String signature) {
         Event event = null;
-        if (endpointSecret != null && !endpointSecret.isEmpty()
-                && signature != null && !signature.isEmpty()) {
-            try {
-                event = clientProvider
-                        .getClient()
-                        .constructEvent(
-                                payload, signature, endpointSecret
-                        );
-            } catch (SignatureVerificationException e) {
-                throw new StripeEventException(
-                        "Can't create an event through signature verification"
-                );
-            }
-        } else {
-            event = Event.GSON.fromJson(payload, Event.class);
+        if (endpointSecret == null || endpointSecret.isBlank()
+                || signature == null || signature.isBlank()) {
+            throw new StripeEventException(
+                    "Stripe webhook secret or signature is missing"
+            );
+        }
+
+        try {
+            event = clientProvider.getClient()
+                    .constructEvent(payload, signature, endpointSecret);
+        } catch (SignatureVerificationException e) {
+            throw new StripeEventException(
+                    "Stripe webhook signature verification failed"
+            );
         }
         if (event == null) {
             throw new StripeEventException("Event object can't be null");
