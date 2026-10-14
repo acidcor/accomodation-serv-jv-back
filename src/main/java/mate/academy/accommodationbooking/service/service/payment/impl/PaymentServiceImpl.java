@@ -11,7 +11,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRedirectionResponse;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentResponseDto;
@@ -32,7 +32,7 @@ import mate.academy.accommodationbooking.service.service.AuthenticatedUserProvid
 import mate.academy.accommodationbooking.service.service.payment.PaymentService;
 import mate.academy.accommodationbooking.service.service.stripe.StripeService;
 
-@Slf4j
+@Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional

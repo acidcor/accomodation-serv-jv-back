@@ -8,12 +8,14 @@ import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import mate.academy.accommodationbooking.service.dto.stripe.StripeRequestDto;
 import mate.academy.accommodationbooking.service.exception.stripe.StripeDataObjectException;
 import mate.academy.accommodationbooking.service.exception.stripe.StripeEventException;
 import mate.academy.accommodationbooking.service.service.payment.PaymentService;
 import mate.academy.accommodationbooking.service.service.stripe.StripeClientProvider;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
@@ -33,7 +35,6 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
                     "Stripe webhook secret or signature is missing"
             );
         }
-
         try {
             event = clientProvider.getClient()
                     .constructEvent(payload, signature, endpointSecret);
@@ -56,7 +57,7 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
                 break;
             }
             default: {
-                System.out.println("Unhandled event type: " + event.getType());
+                log.error("Unhandled event type: {}", event.getType());
             }
 
         }
