@@ -41,6 +41,7 @@ public class BookingController {
         return bookingService.save(request, authentication);
     }
 
+    @Operation(description = "Find booking by id and status.")
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/")
     public Page<BookingResponseDto> findAllBookingsByIdAndStatus(
