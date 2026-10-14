@@ -37,6 +37,7 @@ import mate.academy.accommodationbooking.service.repository.BookingRepository;
 import mate.academy.accommodationbooking.service.repository.PaymentRepository;
 import mate.academy.accommodationbooking.service.service.payment.impl.PaymentServiceImpl;
 import mate.academy.accommodationbooking.service.service.stripe.StripeService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -78,6 +79,7 @@ class PaymentServiceImplTest {
     private PaymentServiceImpl paymentService;
 
     @Test
+    @DisplayName("Find all: admin sees payments of all users")
     void findAll_admin_returnsAllPayments() {
         // given
         User admin = buildUser(Role.ADMIN);
@@ -98,6 +100,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find all: customer sees only their own payments")
     void findAll_customer_returnsOnlyOwnPayments() {
         // given
         User customer = buildUser(Role.CUSTOMER);
@@ -119,6 +122,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Init payment: booking awaiting payment saves a payment with the calculated amount (5 nights x daily rate)")
     void initPayment_awaitPaymentBooking_savesPaymentWithCalculatedAmount() throws Exception {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -152,6 +156,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Init payment: throws EntityNotFoundException when the booking is not found for the user")
     void initPayment_bookingNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -170,6 +175,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Init payment: throws PaymentInitializationException when the booking is not awaiting payment")
     void initPayment_bookingNotAwaitingPayment_throwsPaymentInitializationException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -191,6 +197,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Init payment: throws PaymentInitializationException when Stripe fails to create a session")
     void initPayment_stripeThrows_throwsPaymentInitializationException() throws Exception {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -213,6 +220,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Init payment: throws PaymentInitializationException when Stripe returns a null session")
     void initPayment_stripeReturnsNullSession_throwsPaymentInitializationException()
             throws Exception {
         // given
@@ -235,6 +243,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get success: returns the payment DTO found by session ID for the user")
     void getSuccess_paymentExists_returnsDto() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -253,6 +262,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get success: throws EntityNotFoundException when the payment is not found")
     void getSuccess_paymentNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -269,6 +279,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get cancel: returns the payment DTO found by session ID for the user")
     void getCancel_paymentExists_returnsDto() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -287,6 +298,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get cancel: throws EntityNotFoundException when the payment is not found")
     void getCancel_paymentNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -303,6 +315,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Stripe complete webhook: 'paid' marks the payment PAID and confirms the booking")
     void handleStripeCompleteRequest_paid_confirmsBookingAndMarksPaymentPaid() {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -320,6 +333,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Stripe complete webhook: 'unpaid' leaves payment and booking unchanged")
     void handleStripeCompleteRequest_unpaid_changesNothing() {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -337,6 +351,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Stripe complete webhook: throws EntityNotFoundException when the payment is not found")
     void handleStripeCompleteRequest_paymentNotFound_throwsEntityNotFoundException() {
         // given
         given(paymentRepository.findPaymentBySessionId(SESSION_ID))
@@ -351,6 +366,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Stripe expired webhook: marks the payment EXPIRED")
     void handleStripeExpiredRequest_paymentExists_marksPaymentExpired() {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -366,6 +382,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Stripe expired webhook: throws EntityNotFoundException when the payment is not found")
     void handleStripeExpiredRequest_paymentNotFound_throwsEntityNotFoundException() {
         // given
         given(paymentRepository.findPaymentBySessionId(SESSION_ID))
@@ -380,6 +397,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: complete and paid session marks payment PAID and confirms the booking")
     void syncPayment_sessionCompleteAndPaid_marksPaidAndConfirmsBooking() throws Exception {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -399,6 +417,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: open session keeps AWAIT_PAYMENT and does not touch the booking")
     void syncPayment_sessionOpen_keepsAwaitPaymentAndDoesNotTouchBooking() throws Exception {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -417,6 +436,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: expired session marks the payment EXPIRED")
     void syncPayment_sessionExpired_marksPaymentExpired() throws Exception {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -433,6 +453,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: throws EntityNotFoundException and skips Stripe when the payment is not found")
     void syncPayment_paymentNotFound_throwsEntityNotFoundException() {
         // given
         given(paymentRepository.findById(PAYMENT_ID)).willReturn(Optional.empty());
@@ -447,6 +468,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: throws PaymentSessionException when retrieving the Stripe session fails")
     void syncPayment_stripeRetrieveFails_throwsPaymentSessionException() throws Exception {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -465,6 +487,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payment: throws PaymentSessionException for an unknown session status")
     void syncPayment_unknownSessionStatus_throwsPaymentSessionException() throws Exception {
         // given
         Payment payment = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -482,6 +505,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payments: a failure on one payment does not stop the others from being synced")
     void syncPayments_oneFailsOneSucceeds_failureDoesNotStopTheRest() throws Exception {
         // given
         Payment failing = buildPayment(PaymentStatus.AWAIT_PAYMENT);
@@ -507,6 +531,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Sync payments: no awaiting payments means no Stripe calls and nothing saved")
     void syncPayments_noAwaitingPayments_doesNotCallStripe() {
         // given
         given(paymentRepository.findPaymentsByStatus(PaymentStatus.AWAIT_PAYMENT))
@@ -521,6 +546,7 @@ class PaymentServiceImplTest {
     }
 
     @ParameterizedTest
+    @DisplayName("Renew payment: EXPIRED or AWAIT_PAYMENT payment gets a new session and becomes AWAIT_PAYMENT")
     @EnumSource(value = PaymentStatus.class, names = {"EXPIRED", "AWAIT_PAYMENT"})
     void renewPayment_renewableStatus_setsNewSessionAndAwaitPayment(PaymentStatus status)
             throws Exception {
@@ -550,6 +576,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Renew payment: throws PaymentInitializationException for an already PAID payment")
     void renewPayment_paidPayment_throwsPaymentInitializationException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -570,6 +597,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Renew payment: throws EntityNotFoundException when the payment is not found for the user")
     void renewPayment_paymentNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -587,6 +615,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Renew payment: Stripe failure throws and leaves the payment unchanged")
     void renewPayment_stripeThrows_throwsAndKeepsPaymentUnchanged() throws Exception {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -611,6 +640,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("Renew payment: null Stripe session throws PaymentInitializationException")
     void renewPayment_stripeReturnsNullSession_throwsPaymentInitializationException()
             throws Exception {
         // given

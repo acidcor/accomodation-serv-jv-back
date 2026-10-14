@@ -12,6 +12,7 @@ import mate.academy.accommodationbooking.service.dto.user.auth.UserLoginRequestD
 import mate.academy.accommodationbooking.service.dto.user.auth.UserLoginResponseDto;
 import mate.academy.accommodationbooking.service.security.AuthenticationService;
 import mate.academy.accommodationbooking.service.security.JwtUtil;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +38,7 @@ class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
 
     @Test
+    @DisplayName("Authenticate: valid credentials return a JWT token")
     void authenticate_validCredentials_returnsToken() {
         // given
         UserLoginRequestDto request = new UserLoginRequestDto();
@@ -57,6 +59,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    @DisplayName("Authenticate: bad credentials throw and no token is generated")
     void authenticate_badCredentials_throwsAndDoesNotGenerateToken() {
         // given
         UserLoginRequestDto request = new UserLoginRequestDto();

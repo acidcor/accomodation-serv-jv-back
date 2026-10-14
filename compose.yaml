@@ -29,8 +29,9 @@ services:
       - "${SPRING_APP_PORT}:${DOCKER_APP_PORT}"
       - "${DEBUG_PORT}:${DEBUG_PORT}"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://mariadb:${DB_DOCKER_PORT}/${DB_NAME}?serverTimezone=UTC"
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://mariadb:${DB_DOCKER_PORT}/${DB_NAME}"
       SPRING_DATASOURCE_USERNAME: "${DB_USER}"
       SPRING_DATASOURCE_PASSWORD: "${DB_PASS}"
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "${DB_DRIVER}"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "${DB_DRIVER}"
+      SPRING_JPA_DATABASE_PLATFORM: "${DB_PLATFORM}"
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"

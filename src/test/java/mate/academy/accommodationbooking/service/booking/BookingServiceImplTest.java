@@ -34,6 +34,7 @@ import mate.academy.accommodationbooking.service.repository.BookingRepository;
 import mate.academy.accommodationbooking.service.service.booking.impl.BookingServiceImpl;
 import mate.academy.accommodationbooking.service.service.specification.SpecificationBuilder;
 import mate.academy.accommodationbooking.service.service.telegram.TelegramNotificationService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -73,6 +74,7 @@ class BookingServiceImplTest {
     private BookingServiceImpl bookingService;
 
     @Test
+    @DisplayName("Save: creates a booking as AWAIT_PAYMENT and sends a notification")
     void save_validRequest_savesBookingWithAwaitPaymentAndNotifies() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -105,6 +107,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: throws BookingStatusRestriction when a payment is pending")
     void save_userHasPendingPayment_throwsBookingStatusRestriction() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -128,6 +131,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: throws EntityNotFoundException when accommodation is missing")
     void save_accommodationNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -150,6 +154,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: throws BookingDateException when check-in is in the past")
     void save_checkInInThePast_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -172,6 +177,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: throws BookingDateException when check-in is not before check-out")
     void save_checkInNotBeforeCheckOut_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -194,6 +200,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: throws BookingDateException when dates are already reserved")
     void save_datesAlreadyReserved_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -221,6 +228,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find all: returns a mapped page of the user's bookings")
     void findAll_userWithBookings_returnsMappedPage() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -242,6 +250,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: admin looks the booking up by ID only")
     void findById_admin_searchesByIdOnly() {
         // given
         User admin = buildUser(Role.ADMIN);
@@ -261,6 +270,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: admin gets EntityNotFoundException when nothing is found")
     void findById_adminBookingNotFound_throwsEntityNotFoundException() {
         // given
         User admin = buildUser(Role.ADMIN);
@@ -277,6 +287,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: customer looks the booking up by ID and user")
     void findById_customer_searchesByIdAndUser() {
         // given
         User customer = buildUser(Role.CUSTOMER);
@@ -297,6 +308,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: customer gets EntityNotFoundException when nothing is found")
     void findById_customerBookingNotFound_throwsEntityNotFoundException() {
         // given
         User customer = buildUser(Role.CUSTOMER);
@@ -314,6 +326,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): updates the booking and its accommodation, then saves")
     void putById_validRequest_updatesBookingAndAccommodation() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -344,6 +357,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): throws EntityNotFoundException when booking is missing")
     void putById_bookingNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -365,6 +379,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): throws EntityNotFoundException when accommodation is missing")
     void putById_accommodationNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -390,6 +405,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): throws BookingDateException when dates overlap another booking")
     void putById_datesOverlapAnotherBooking_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -418,6 +434,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): throws BookingDateException when check-in is not before check-out")
     void putById_checkInNotBeforeCheckOut_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -441,6 +458,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: keeps the current accommodation and saves")
     void patchById_withoutAccommodation_keepsCurrentAccommodationAndSaves() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -471,6 +489,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: changes the accommodation when a new one is given")
     void patchById_withNewAccommodation_changesAccommodation() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -501,6 +520,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: throws EntityNotFoundException when booking is missing")
     void patchById_bookingNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -520,6 +540,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: throws EntityNotFoundException when accommodation is missing")
     void patchById_accommodationNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -545,6 +566,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: throws BookingDateException when the resulting dates are invalid")
     void patchById_resultingDatesInvalid_throwsBookingDateException() {
         // given: the mapper is mocked, so the booking already holds the "patched" dates
         User user = buildUser(Role.CUSTOMER);
@@ -568,6 +590,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: throws BookingDateException when dates overlap another booking")
     void patchById_datesOverlapAnotherBooking_throwsBookingDateException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -594,6 +617,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Cancel: sets CANCELED and sends a notification")
     void cancelBooking_activeBooking_setsCanceledAndNotifies() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -618,6 +642,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Cancel: throws BookingCancelingException when already canceled")
     void cancelBooking_alreadyCanceled_throwsBookingCancelingException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -640,6 +665,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Cancel: throws EntityNotFoundException when booking is missing")
     void cancelBooking_bookingNotFound_throwsEntityNotFoundException() {
         // given
         User user = buildUser(Role.CUSTOMER);
@@ -658,6 +684,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID and status: returns a mapped page for the search params")
     void findByIdAndStatus_searchParams_returnsMappedPage() {
         // given
         SearchParamDto request = mock(SearchParamDto.class);
@@ -680,6 +707,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Expire bookings: sets EXPIRED, saves all and notifies for each")
     void expireBookings_bookingsFound_setsExpiredSavesAndNotifies() {
         // given
         LocalDate tomorrow = LocalDate.now().plusDays(1);
@@ -711,6 +739,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Expire bookings: nothing found means no notification")
     void expireBookings_nothingFound_doesNotNotify() {
         // given
         LocalDate tomorrow = LocalDate.now().plusDays(1);
@@ -726,6 +755,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Realised bookings: sends notifications without saving anything")
     void realisedBookings_bookingsFound_notifiesWithoutSaving() {
         // given
         LocalDate today = LocalDate.now();

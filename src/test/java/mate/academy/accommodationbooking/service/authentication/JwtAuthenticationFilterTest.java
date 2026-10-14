@@ -12,6 +12,7 @@ import io.jsonwebtoken.JwtException;
 import mate.academy.accommodationbooking.service.security.JwtAuthenticationFilter;
 import mate.academy.accommodationbooking.service.security.JwtUtil;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,6 +50,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Filter: no Authorization header means no authentication, chain continues")
     void doFilter_noAuthorizationHeader_noAuthenticationAndChainContinues() throws Exception {
         // given: request without Authorization header
 
@@ -63,6 +65,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Filter: non-Bearer header is ignored, chain continues")
     void doFilter_headerWithoutBearerPrefix_noAuthenticationAndChainContinues()
             throws Exception {
         // given
@@ -79,6 +82,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Filter: valid Bearer token authenticates the user, chain continues")
     void doFilter_validToken_setsAuthenticationAndChainContinues() throws Exception {
         // given
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + TOKEN);
@@ -102,6 +106,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Filter: invalid token means no authentication, chain continues")
     void doFilter_tokenReportedInvalid_noAuthenticationAndChainContinues() throws Exception {
         // given
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + TOKEN);
@@ -117,6 +122,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Filter: JwtException from JwtUtil propagates, chain is not called")
     void doFilter_jwtUtilThrows_exceptionPropagatesAndChainNotCalled() {
         // given
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + TOKEN);

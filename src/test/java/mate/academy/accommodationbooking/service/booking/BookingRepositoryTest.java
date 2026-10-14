@@ -17,6 +17,7 @@ import mate.academy.accommodationbooking.service.model.Booking;
 import mate.academy.accommodationbooking.service.model.BookingStatus;
 import mate.academy.accommodationbooking.service.model.User;
 import mate.academy.accommodationbooking.service.repository.BookingRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -49,6 +50,7 @@ class BookingRepositoryTest {
     private EntityManager entityManager;
 
     @Test
+    @DisplayName("Dates overlap check: overlapping active booking returns true")
     void existsBookingInRequestDates_overlappingActiveBooking_returnsTrue() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -62,6 +64,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Dates overlap check: check-in on an existing check-out day is free")
     void existsBookingInRequestDates_checkInEqualsExistingCheckOut_returnsFalse() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -75,6 +78,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Dates overlap check: canceled bookings are ignored")
     void existsBookingInRequestDates_onlyCanceledBookingOverlaps_returnsFalse() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -88,6 +92,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Dates overlap check: expired bookings are ignored")
     void existsBookingInRequestDates_onlyExpiredBookingOverlaps_returnsFalse() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_2_ID);
@@ -101,6 +106,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Dates overlap check: soft-deleted bookings are ignored")
     void existsBookingInRequestDates_onlySoftDeletedBookingOverlaps_returnsFalse() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -114,6 +120,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Overlap check excluding ID: the excluded booking is not a conflict")
     void existsBookingInRequestDatesExcludingId_onlyOverlapIsExcludedBooking_returnsFalse() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -129,6 +136,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Overlap check excluding ID: another overlapping booking returns true")
     void existsBookingInRequestDatesExcludingId_overlapWithAnotherBooking_returnsTrue() {
         // given
         Accommodation accommodation = accommodation(ACCOMMODATION_1_ID);
@@ -144,6 +152,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by user: returns only own bookings that are not soft-deleted")
     void findBookingsByUser_userWithBookings_returnsOnlyOwnNotDeletedBookings() {
         // given
         User user = user(USER_1_ID);
@@ -161,6 +170,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by user: page size 1 returns only the first page")
     void findBookingsByUser_pageSizeOne_returnsFirstPageOnly() {
         // given
         User user = user(USER_1_ID);
@@ -176,6 +186,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by ID and user: returns the booking for its owner")
     void findBookingByIdAndUser_bookingBelongsToUser_returnsBooking() {
         // given
         User user = user(USER_1_ID);
@@ -190,6 +201,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by ID and user: another user's booking returns empty")
     void findBookingByIdAndUser_bookingBelongsToAnotherUser_returnsEmpty() {
         // given
         User anotherUser = user(USER_2_ID);
@@ -203,6 +215,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by ID and user: soft-deleted booking returns empty")
     void findBookingByIdAndUser_bookingSoftDeleted_returnsEmpty() {
         // given
         User user = user(USER_1_ID);
@@ -216,6 +229,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find all by specification: returns only bookings with the status")
     void findAll_specificationByStatus_returnsOnlyMatchingBookings() {
         // given
         Specification<Booking> spec = (root, query, cb) ->
@@ -231,6 +245,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by check-out date: returns bookings up to the date, except EXPIRED")
     void findBookingsByCheckOutLessThanEqualAndStatusNot_matchingBookings_returnsThem() {
         // given
         LocalDate date = LocalDate.of(2026, 12, 15);
@@ -245,6 +260,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by check-out date: date before all check-outs returns empty")
     void findBookingsByCheckOutLessThanEqualAndStatusNot_dateBeforeAllCheckOuts_returnsEmpty() {
         // given
         LocalDate date = LocalDate.of(2026, 12, 4);
@@ -258,6 +274,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Exists by user and status: true when the user has such a booking")
     void existsBookingByUserIdAndStatus_userHasBookingWithStatus_returnsTrue() {
         // given: user 2 owns the EXPIRED booking
 
@@ -270,6 +287,7 @@ class BookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Exists by user and status: false when the user has no such booking")
     void existsBookingByUserIdAndStatus_userHasNoBookingWithStatus_returnsFalse() {
         // given: user 1 has no EXPIRED booking
 

@@ -24,6 +24,7 @@ import mate.academy.accommodationbooking.service.model.Amenity;
 import mate.academy.accommodationbooking.service.repository.AccommodationRepository;
 import mate.academy.accommodationbooking.service.repository.AmenityRepository;
 import mate.academy.accommodationbooking.service.service.accommodation.impl.AccommodationServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +52,7 @@ public class AccommodationServiceImplTest {
     private AccommodationServiceImpl accommodationService;
 
     @Test
+    @DisplayName("Save: resolves amenities by ID and saves the accommodation")
     void save_validRequestWithAmenities_savesAccommodationWithResolvedAmenities() {
         // Given
         AccommodationRequestDto request = new AccommodationRequestDto();
@@ -75,6 +77,7 @@ public class AccommodationServiceImplTest {
     }
 
     @ParameterizedTest
+    @DisplayName("Save: null or empty amenities are saved as empty, no lookup")
     @NullAndEmptySource
     void save_nullOrEmptyAmenities_savesWithEmptyAmenitiesWithoutLookup(List<Long> amenityIds) {
         // Given
@@ -98,6 +101,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: duplicated amenity IDs are looked up only once")
     void save_duplicatedAmenityIds_looksUpEachIdOnlyOnce() {
         // Given
         AccommodationRequestDto request = new AccommodationRequestDto();
@@ -119,6 +123,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save: unknown amenity IDs throw EntityNotFoundException, no save")
     void save_unknownAmenityIds_throwsNotFoundListingMissingIdsAndDoesNotSave() {
         // Given
         AccommodationRequestDto request = new AccommodationRequestDto();
@@ -136,6 +141,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find all: returns a mapped page and keeps the paging info")
     void findAll_existingAccommodations_returnsMappedPageKeepingPagingInfo() {
         // Given
         Pageable pageable = PageRequest.of(0, 2);
@@ -159,6 +165,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find all: returns an empty page when nothing exists")
     void findAll_noAccommodations_returnsEmptyPage() {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
@@ -173,6 +180,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: returns the mapped DTO for an existing ID")
     void findById_existingId_returnsMappedDto() {
         // Given
         Accommodation entity = accommodation(ID);
@@ -188,6 +196,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Find by ID: throws EntityNotFoundException for an unknown ID")
     void findById_unknownId_throwsNotFound() {
         // Given
         when(accommodationRepository.findById(99L)).thenReturn(Optional.empty());
@@ -200,6 +209,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): updates the entity, replaces amenities and saves")
     void updateById_validRequest_updatesEntityReplacesAmenitiesAndSaves() {
         // Given
         AccommodationUpdateRequestDto request = new AccommodationUpdateRequestDto();
@@ -225,6 +235,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): null amenities clear the existing ones")
     void updateById_nullAmenities_clearsExistingAmenities() {
         // Given
         AccommodationUpdateRequestDto request = new AccommodationUpdateRequestDto();
@@ -245,6 +256,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): unknown ID throws EntityNotFoundException, no changes")
     void updateById_unknownId_throwsNotFoundAndChangesNothing() {
         // Given
         AccommodationUpdateRequestDto request = new AccommodationUpdateRequestDto();
@@ -259,6 +271,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update (PUT): unknown amenity ID throws EntityNotFoundException")
     void updateById_unknownAmenityId_throwsNotFoundAndDoesNotSave() {
         // Given
         AccommodationUpdateRequestDto request = new AccommodationUpdateRequestDto();
@@ -276,6 +289,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: patches the entity and replaces amenities")
     void patchById_withAmenities_patchesEntityAndReplacesAmenities() {
         // Given
         AccommodationPatchRequestDto request = new AccommodationPatchRequestDto();
@@ -297,6 +311,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: null amenities keep the existing ones")
     void patchById_nullAmenities_keepsExistingAmenities() {
         // Given
         AccommodationPatchRequestDto request = new AccommodationPatchRequestDto();
@@ -319,6 +334,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: empty amenities list clears the existing ones")
     void patchById_emptyAmenitiesList_clearsExistingAmenities() {
         // Given
         AccommodationPatchRequestDto request = new AccommodationPatchRequestDto();
@@ -338,6 +354,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: unknown ID throws EntityNotFoundException, nothing is saved")
     void patchById_unknownId_throwsNotFound() {
         // Given
         AccommodationPatchRequestDto request = new AccommodationPatchRequestDto();
@@ -352,6 +369,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch: unknown amenity ID throws EntityNotFoundException")
     void patchById_unknownAmenityId_throwsNotFoundAndDoesNotSave() {
         // Given
         AccommodationPatchRequestDto request = new AccommodationPatchRequestDto();
@@ -370,6 +388,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Delete: existing ID is deleted")
     void delete_existingId_deletesById() {
         // Given
         when(accommodationRepository.existsById(ID)).thenReturn(true);
@@ -382,6 +401,7 @@ public class AccommodationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Delete: unknown ID throws EntityNotFoundException, nothing deleted")
     void delete_unknownId_throwsNotFoundAndDeletesNothing() {
         // Given
         when(accommodationRepository.existsById(99L)).thenReturn(false);

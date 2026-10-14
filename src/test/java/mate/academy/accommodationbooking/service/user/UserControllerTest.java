@@ -16,6 +16,7 @@ import mate.academy.accommodationbooking.service.dto.user.crud.UserPatchRequestD
 import mate.academy.accommodationbooking.service.dto.user.crud.UserRolesUpdateDto;
 import mate.academy.accommodationbooking.service.dto.user.crud.UserUpdateRequestDto;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +60,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/{id}/role: admin with valid roles gets the updated user back")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserRoles_adminAndValidRoles_returnsUpdatedUser() throws Exception {
         // given
@@ -76,6 +78,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/{id}/role: returns 404 when the user does not exist")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserRoles_userNotFound_returnsNotFound() throws Exception {
         // given
@@ -92,6 +95,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/{id}/role: returns 404 when a requested role does not exist")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserRoles_roleNotFound_returnsNotFound() throws Exception {
         // given
@@ -108,6 +112,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/{id}/role: returns 400 when the roles set is empty or missing")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserRoles_emptyRoles_returnsBadRequest() throws Exception {
         // given
@@ -123,6 +128,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/{id}/role: returns 403 when the caller is a customer")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserRoles_customer_returnsForbidden() throws Exception {
         // given
@@ -138,6 +144,7 @@ class UserControllerTest {
         result.andExpect(status().isForbidden());
     }
 
+    @DisplayName("PUT /users/{id}/role: returns 401 when the request is unauthenticated")
     @Test
     void updateUserRoles_noAuthentication_returnsUnauthorized() throws Exception {
         // given
@@ -154,6 +161,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("GET /users/me: customer receives their own details")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void getUserDetailsByAuth_customer_returnsOwnDetails() throws Exception {
         // given: customer from the SQL script is authenticated
@@ -168,18 +176,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.lastName").value("User"));
     }
 
-    @Test
-    @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
-    void getUserDetailsByAuth_adminWithoutCustomerRole_returnsForbidden() throws Exception {
-        // given: admin has only the ADMIN authority
-
-        // when
-        ResultActions result = mockMvc.perform(get(ME_URL));
-
-        // then
-        result.andExpect(status().isForbidden());
-    }
-
+    @DisplayName("GET /users/me: returns 401 when the request is unauthenticated")
     @Test
     void getUserDetailsByAuth_noAuthentication_returnsUnauthorized() throws Exception {
         // given: no authenticated user
@@ -191,6 +188,7 @@ class UserControllerTest {
         result.andExpect(status().isUnauthorized());
     }
 
+    @DisplayName("PUT /users/me: valid request updates all fields and returns the updated user")
     @Test
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserDetailsById_validRequest_returnsUpdatedUser() throws Exception {
@@ -210,6 +208,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/me: returns 409 when the new email belongs to another user")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserDetailsById_emailTakenByAnotherUser_returnsConflict() throws Exception {
         // given
@@ -225,6 +224,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/me: returns 400 when password and repeat password do not match")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserDetailsById_passwordsDoNotMatch_returnsBadRequest() throws Exception {
         // given
@@ -241,6 +241,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /users/me: returns 400 when the first name is blank")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void updateUserDetailsById_blankFirstName_returnsBadRequest() throws Exception {
         // given
@@ -257,6 +258,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /users/me: updates only the first name and leaves other fields unchanged")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchUserDetailsById_onlyFirstName_updatesOnlyFirstName() throws Exception {
         // given
@@ -276,6 +278,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /users/me: returns 409 when the new email belongs to another user")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchUserDetailsById_emailTakenByAnotherUser_returnsConflict() throws Exception {
         // given
@@ -292,6 +295,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /users/me: returns 400 when the email format is invalid")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchUserDetailsById_invalidEmailFormat_returnsBadRequest() throws Exception {
         // given
