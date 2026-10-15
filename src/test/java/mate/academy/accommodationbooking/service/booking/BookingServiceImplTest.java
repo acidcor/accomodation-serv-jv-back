@@ -802,6 +802,7 @@ class BookingServiceImplTest {
         Booking booking = new Booking();
         booking.setId(BOOKING_ID);
         booking.setAccommodation(accommodation);
+        booking.setStatus(BookingStatus.AWAIT_PAYMENT);
         booking.setCheckIn(checkIn);
         booking.setCheckOut(checkOut);
         return booking;
