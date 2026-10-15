@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import mate.academy.accommodationbooking.service.dto.booking.BookingPatchUpdateRequestDto;
 import mate.academy.accommodationbooking.service.dto.booking.BookingRequestDto;
 import mate.academy.accommodationbooking.service.service.telegram.TelegramNotificationService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +69,7 @@ class BookingControllerTest {
     private TelegramNotificationService notificationService;
 
     @Test
+    @DisplayName("POST /bookings: valid request creates a booking and notifies")
     @WithUserDetails(value = OTHER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_validRequest_returnsCreatedBookingAndNotifies() throws Exception {
         // given: this user has no booking in AWAIT_PAYMENT status
@@ -88,6 +90,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 400 when dates overlap an existing booking")
     @WithUserDetails(value = OTHER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_datesOverlapExistingBooking_returnsBadRequest() throws Exception {
         // given: booking 1000 occupies accommodation 1000 from 2026-12-10 to 2026-12-15
@@ -105,6 +108,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 400 when check-in is in the past")
     @WithUserDetails(value = OTHER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_checkInInThePast_returnsBadRequest() throws Exception {
         // given
@@ -121,6 +125,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 404 when the accommodation does not exist")
     @WithUserDetails(value = OTHER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_accommodationNotFound_returnsNotFound() throws Exception {
         // given
@@ -137,6 +142,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 409 when the user has a pending payment")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_userHasPendingPayment_returnsConflict() throws Exception {
         // given: customer owns booking 1000 in AWAIT_PAYMENT status
@@ -154,6 +160,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 400 when check-in is missing")
     @WithUserDetails(value = OTHER_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_missingCheckIn_returnsBadRequest() throws Exception {
         // given
@@ -169,6 +176,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void saveBooking_admin_returnsForbidden() throws Exception {
         // given
@@ -185,6 +193,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("POST /bookings: returns 401 when unauthenticated")
     void saveBooking_noAuthentication_returnsUnauthorized() throws Exception {
         // given
         BookingRequestDto request = buildRequest(date(2099, 6, 1), date(2099, 6, 5),
@@ -200,6 +209,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/: admin sees all bookings that are not soft-deleted")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void findAllBookingsByIdAndStatus_admin_returnsAllNotDeletedBookings() throws Exception {
         // given: bookings 1000 to 1003 are visible, 1004 is soft-deleted
@@ -213,6 +223,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/: returns 403 for a customer")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findAllBookingsByIdAndStatus_customer_returnsForbidden() throws Exception {
         // given: customer without the ADMIN authority
@@ -225,6 +236,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/my: customer sees only own non-deleted bookings")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findAllBookingsByAuth_customer_returnsOnlyOwnNotDeletedBookings() throws Exception {
         // given: customer owns 1000 and 1001, booking 1004 is soft-deleted
@@ -238,6 +250,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/my: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void findAllBookingsByAuth_admin_returnsForbidden() throws Exception {
         // given: admin without the CUSTOMER authority
@@ -250,6 +263,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/{id}: returns the customer's own booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findBookingById_ownBooking_returnsBooking() throws Exception {
         // given: booking 1000 belongs to the customer and is AWAIT_PAYMENT
@@ -264,6 +278,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/{id}: returns 404 for another user's booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findBookingById_bookingOfAnotherUser_returnsNotFound() throws Exception {
         // given: booking 1002 belongs to another user
@@ -276,6 +291,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/{id}: returns 404 for a soft-deleted booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findBookingById_softDeletedBooking_returnsNotFound() throws Exception {
         // given: booking 1004 belongs to the customer but is soft-deleted
@@ -288,6 +304,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("GET /bookings/{id}: returns 404 for a non-existing booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findBookingById_notExistingBooking_returnsNotFound() throws Exception {
         // given: no booking with this id
@@ -300,6 +317,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /bookings/{id}: valid request returns the updated booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void putBookingById_validRequest_returnsUpdatedBooking() throws Exception {
         // given: move booking 1000 to accommodation 1001 on free dates
@@ -319,6 +337,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /bookings/{id}: returns 400 when dates overlap another booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void putBookingById_datesOverlapAnotherBooking_returnsBadRequest() throws Exception {
         // given: booking 1002 (CONFIRMED) occupies accommodation 1000 from 2026-12-01 to 12-05
@@ -335,6 +354,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /bookings/{id}: returns 400 when check-out is before check-in")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void putBookingById_checkOutBeforeCheckIn_returnsBadRequest() throws Exception {
         // given
@@ -351,6 +371,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /bookings/{id}: returns 404 for another user's booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void putBookingById_bookingOfAnotherUser_returnsNotFound() throws Exception {
         // given: booking 1002 belongs to another user
@@ -367,6 +388,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /bookings/{id}: returns 400 when accommodation is missing")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void putBookingById_missingAccommodation_returnsBadRequest() throws Exception {
         // given
@@ -382,6 +404,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /bookings/{id}: updates only the check-out date")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchBookingById_onlyCheckOut_updatesOnlyCheckOut() throws Exception {
         // given: booking 1000 runs from 2026-12-10 to 2026-12-15, no booking in 12-15..12-18
@@ -400,6 +423,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /bookings/{id}: returns 400 when check-in is after check-out")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchBookingById_checkInAfterCheckOut_returnsBadRequest() throws Exception {
         // given: current check-out of booking 1000 is 2026-12-15
@@ -416,6 +440,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /bookings/{id}: returns 400 when dates overlap another booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchBookingById_overlappingDates_returnsBadRequest() throws Exception {
         // given: booking 1002 (CONFIRMED) occupies accommodation 1000 from 2026-12-01 to 12-05
@@ -433,6 +458,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /bookings/{id}: returns 404 when the accommodation does not exist")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchBookingById_accommodationNotFound_returnsNotFound() throws Exception {
         // given
@@ -449,6 +475,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /bookings/{id}: returns 404 for another user's booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void patchBookingById_bookingOfAnotherUser_returnsNotFound() throws Exception {
         // given: booking 1002 belongs to another user
@@ -465,6 +492,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("DELETE /bookings/{id}: cancels own active booking and notifies")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelBookingById_ownActiveBooking_returnsCanceledBookingAndNotifies()
             throws Exception {
@@ -481,6 +509,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("DELETE /bookings/{id}: returns 409 for an already canceled booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelBookingById_alreadyCanceled_returnsConflict() throws Exception {
         // given: booking 1001 is already CANCELED
@@ -494,6 +523,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("DELETE /bookings/{id}: returns 404 for another user's booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelBookingById_bookingOfAnotherUser_returnsNotFound() throws Exception {
         // given: booking 1002 belongs to another user
@@ -506,6 +536,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("DELETE /bookings/{id}: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelBookingById_admin_returnsForbidden() throws Exception {
         // given: admin without the CUSTOMER authority

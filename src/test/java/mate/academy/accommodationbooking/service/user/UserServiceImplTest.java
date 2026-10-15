@@ -27,6 +27,7 @@ import mate.academy.accommodationbooking.service.model.User;
 import mate.academy.accommodationbooking.service.repository.RoleRepository;
 import mate.academy.accommodationbooking.service.repository.UserRepository;
 import mate.academy.accommodationbooking.service.service.user.impl.UserServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,6 +58,7 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Test
+    @DisplayName("Register: valid request encodes password, assigns CUSTOMER role and returns DTO")
     void register_validRequest_returnsDtoWithEncodedPasswordAndCustomerRole() {
         // given
         UserRegisterRequestDto request = buildRegisterRequest();
@@ -82,6 +84,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Register: throws RegistrationException when email is already taken")
     void register_emailAlreadyExists_throwsRegistrationException() {
         // given
         UserRegisterRequestDto request = buildRegisterRequest();
@@ -98,6 +101,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Register: throws EntityNotFoundException when default CUSTOMER role is missing")
     void register_defaultRoleMissing_throwsEntityNotFoundException() {
         // given
         UserRegisterRequestDto request = buildRegisterRequest();
@@ -117,6 +121,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update roles: replaces user's roles with the requested ones and returns updated DTO")
     void updateRoles_validRoles_returnsUpdatedDto() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -141,6 +146,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update roles: throws EntityNotFoundException when user does not exist")
     void updateRoles_userNotFound_throwsEntityNotFoundException() {
         // given
         UserRolesUpdateDto request = new UserRolesUpdateDto();
@@ -158,6 +164,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update roles: throws EntityNotFoundException listing the role IDs that were not found")
     void updateRoles_someRolesNotFound_throwsWithMissingIds() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -178,6 +185,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get details: returns DTO for the currently authenticated user")
     void getUserDetails_authenticatedUser_returnsDto() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -193,6 +201,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update details (PUT): new free email and password are applied, password is encoded")
     void updateUserDetails_newFreeEmailAndPassword_updatesAndEncodesPassword() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -216,6 +225,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update details (PUT): same email in different case skips the existence check")
     void updateUserDetails_sameEmailDifferentCase_skipsExistenceCheck() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -236,6 +246,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update details (PUT): throws EmailExistenceException when email belongs to another user")
     void updateUserDetails_emailTakenByAnotherUser_throwsEmailExistenceException() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -255,6 +266,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch details (PATCH): null email and password are saved without checks or encoding")
     void patchUserDetails_emailAndPasswordNull_savesWithoutChecksOrEncoding() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -279,6 +291,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch details (PATCH): new email and password are applied, password is encoded")
     void patchUserDetails_newEmailAndPassword_updatesAndEncodesPassword() {
         // given
         User user = buildUser(USER_ID, EMAIL);
@@ -303,6 +316,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Patch details (PATCH): throws EmailExistenceException when email belongs to another user")
     void patchUserDetails_emailTakenByAnotherUser_throwsEmailExistenceException() {
         // given
         User user = buildUser(USER_ID, EMAIL);

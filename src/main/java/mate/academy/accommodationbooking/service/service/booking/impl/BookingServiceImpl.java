@@ -125,6 +125,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find booking with such ID: " + id)
                 );
+        checkStatusModifying(booking);
         Accommodation accommodation = accommodationRepository
                 .findById(accommodationId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -155,6 +156,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find booking with such ID: " + id)
                 );
+        checkStatusModifying(booking);
         bookingMapper.patchEntity(request, booking);
         Long accommodationId = request.getAccommodation();
         Accommodation accommodation = booking.getAccommodation();
@@ -243,6 +245,14 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
             throw new BookingDateException(String.format(
                     "Date already reserved for date between %s and %s", checkIn, checkOut)
             );
+        }
+    }
+
+    private void checkStatusModifying(Booking booking) {
+        BookingStatus bookingStatus = booking.getStatus();
+        if (bookingStatus != BookingStatus.AWAIT_PAYMENT) {
+            throw new BookingStatusRestriction("You can't modify booking with status: "
+                    + bookingStatus);
         }
     }
 

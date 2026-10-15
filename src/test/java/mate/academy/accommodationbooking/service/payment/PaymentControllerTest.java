@@ -1,5 +1,6 @@
 package mate.academy.accommodationbooking.service.payment;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -18,6 +19,7 @@ import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
 import mate.academy.accommodationbooking.service.dto.payment.PaymentRequestDto;
 import mate.academy.accommodationbooking.service.service.stripe.StripeService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -76,6 +78,7 @@ class PaymentControllerTest {
     private StripeService stripeService;
 
     @Test
+    @DisplayName("GET /payments: customer sees only their own payments")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void findAll_customer_returnsOnlyOwnPayments() throws Exception {
         // given: customer owns payments 4001, 4002 and 4003
@@ -89,6 +92,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments: admin sees all payments")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void findAll_admin_returnsAllPayments() throws Exception {
         // given: four payments in the SQL script
@@ -102,6 +106,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments: returns 401 when unauthenticated")
     void findAll_noAuthentication_returnsUnauthorized() throws Exception {
         // given: no authenticated user
 
@@ -113,6 +118,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns the Stripe session URL and saves the payment")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_awaitPaymentBooking_returnsSessionUrlAndSavesPayment() throws Exception {
         // given: 5 nights * 150.00 = 750
@@ -135,6 +141,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 404 for another user's booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_bookingOfAnotherUser_returnsNotFound() throws Exception {
         // given
@@ -151,6 +158,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 404 for a non-existing booking")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_notExistingBooking_returnsNotFound() throws Exception {
         // given
@@ -166,6 +174,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 400 when the booking is not awaiting payment")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_bookingNotAwaitingPayment_returnsBadRequest() throws Exception {
         // given: booking 4002 is CONFIRMED
@@ -182,6 +191,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 400 and saves nothing when Stripe has no session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_stripeReturnsNoSession_returnsBadRequestAndSavesNothing()
             throws Exception {
@@ -201,6 +211,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void initPayment_admin_returnsForbidden() throws Exception {
         // given: admin without the CUSTOMER authority
@@ -216,6 +227,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments: returns 401 when unauthenticated")
     void initPayment_noAuthentication_returnsUnauthorized() throws Exception {
         // given
         PaymentRequestDto request = buildRequest(BOOKING_WITHOUT_PAYMENT_ID);
@@ -230,6 +242,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: expired payment gets a new session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_expiredPayment_returnsNewSessionAndAwaitPayment() throws Exception {
         // given
@@ -249,6 +262,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: payment awaiting payment gets a new session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_awaitingPayment_returnsNewSession() throws Exception {
         // given
@@ -264,6 +278,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: returns 400 for a PAID payment, keeps it as is")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_paidPayment_returnsBadRequestAndKeepsPayment() throws Exception {
         // given: payment 4002 is PAID
@@ -278,6 +293,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: returns 404 for another user's payment")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_paymentOfAnotherUser_returnsNotFound() throws Exception {
         // given: payment 4004 belongs to another user
@@ -291,6 +307,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: returns 404 for a non-existing payment")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_notExistingPayment_returnsNotFound() throws Exception {
         // given: no payment with this id
@@ -303,6 +320,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /payments/{id}/: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void renewPayment_admin_returnsForbidden() throws Exception {
         // given: admin without the CUSTOMER authority
@@ -315,6 +333,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/{id}/sync: paid session marks PAID, confirms the booking")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void syncPayment_sessionPaid_marksPaymentPaidAndConfirmsBooking() throws Exception {
         // given: payment 4001 (sess_c1) is AWAIT_PAYMENT in the DB
@@ -331,6 +350,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/{id}/sync: expired session marks the payment EXPIRED")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void syncPayment_sessionExpired_marksPaymentExpired() throws Exception {
         // given
@@ -347,6 +367,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/{id}/sync: returns 404 for a non-existing payment")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void syncPayment_notExistingPayment_returnsNotFound() throws Exception {
         // given: no payment with this id
@@ -360,6 +381,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/{id}/sync: returns 403 for a customer")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void syncPayment_customer_returnsForbidden() throws Exception {
         // given: customer without the ADMIN authority
@@ -372,6 +394,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/all/sync: admin syncs only payments awaiting payment")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void syncAllPayments_admin_syncsOnlyAwaitingPayments() throws Exception {
         // given: AWAIT_PAYMENT payments are 4001 (sess_c1) and 4004 (sess_o1)
@@ -394,6 +417,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/all/sync: returns 403 for a customer")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void syncAllPayments_customer_returnsForbidden() throws Exception {
         // given: customer without the ADMIN authority
@@ -407,6 +431,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/success: returns the payment of the customer's session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void successPayment_ownSession_returnsPayment() throws Exception {
         // given: session sess_c2 belongs to the customer's payment 4002
@@ -421,6 +446,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/success: returns 404 for another user's session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void successPayment_sessionOfAnotherUser_returnsNotFound() throws Exception {
         // given: session sess_o1 belongs to another user
@@ -433,6 +459,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/success: returns 400 when session_id is missing")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void successPayment_missingSessionId_returnsBadRequest() throws Exception {
         // given: no session_id parameter
@@ -445,6 +472,7 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/success: returns 403 for an admin")
     @WithUserDetails(value = ADMIN_EMAIL, setupBefore = TEST_EXECUTION)
     void successPayment_admin_returnsForbidden() throws Exception {
         // given: admin without the CUSTOMER authority
@@ -457,20 +485,21 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /payments/cancel: returns the massage of the customer's session with booking ID")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelPayment_ownSession_returnsPayment() throws Exception {
-        // given: session sess_c1 belongs to the customer's payment 4001
-
         // when
         ResultActions result = mockMvc.perform(get(CANCEL_URL).param("session_id", "sess_c1"));
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(AWAITING_PAYMENT_ID))
-                .andExpect(jsonPath("$.status").value("AWAIT_PAYMENT"));
+                .andExpect(jsonPath("$.message")
+                        .value(containsString(AWAITING_PAYMENT_ID.toString())));
+
     }
 
     @Test
+    @DisplayName("GET /payments/cancel: returns 404 for another user's session")
     @WithUserDetails(value = CUSTOMER_EMAIL, setupBefore = TEST_EXECUTION)
     void cancelPayment_sessionOfAnotherUser_returnsNotFound() throws Exception {
         // given: session sess_o1 belongs to another user

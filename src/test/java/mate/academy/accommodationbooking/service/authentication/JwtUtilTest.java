@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.jsonwebtoken.JwtException;
 import mate.academy.accommodationbooking.service.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +28,7 @@ class JwtUtilTest {
     }
 
     @Test
+    @DisplayName("Generate token: result is valid and contains the user's email")
     void generateToken_validEmail_tokenIsValidAndContainsEmail() {
         // given
         String token = jwtUtil.generateToken(EMAIL);
@@ -41,6 +43,7 @@ class JwtUtilTest {
     }
 
     @Test
+    @DisplayName("Validate token: malformed token throws JwtException")
     void isValidToken_garbageToken_throwsJwtException() {
         // given
         String garbageToken = "not.a.jwt";
@@ -54,6 +57,7 @@ class JwtUtilTest {
     }
 
     @Test
+    @DisplayName("Validate token: token signed with another secret throws JwtException")
     void isValidToken_signedWithOtherSecret_throwsJwtException() {
         // given
         JwtUtil other = new JwtUtil("ABCDEFGHIJKLMNOPQRSTUVWXYZ012345");
@@ -69,6 +73,7 @@ class JwtUtilTest {
     }
 
     @Test
+    @DisplayName("Validate token: expired token throws JwtException")
     void isValidToken_expiredToken_throwsJwtException() {
         // given
         ReflectionTestUtils.setField(jwtUtil, "expiration", -1000L);

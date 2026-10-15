@@ -14,6 +14,7 @@ import tools.jackson.databind.ObjectMapper;
 import mate.academy.accommodationbooking.service.dto.user.auth.UserLoginRequestDto;
 import mate.academy.accommodationbooking.service.dto.user.auth.UserRegisterRequestDto;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,6 +55,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/register: valid request returns the created user")
     @Sql(scripts = REMOVE_REGISTERED_SQL, executionPhase = AFTER_TEST_METHOD)
     void register_validRequest_returnsCreatedUser() throws Exception {
         // given
@@ -73,6 +75,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/register: returns 409 when the email is already registered")
     @Sql(scripts = ADD_USER_SQL, executionPhase = BEFORE_TEST_METHOD)
     @Sql(scripts = REMOVE_USER_SQL, executionPhase = AFTER_TEST_METHOD)
     void register_emailAlreadyExists_returnsError() throws Exception {
@@ -91,6 +94,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/register: returns 400 when passwords do not match")
     void register_passwordsDoNotMatch_returnsBadRequest() throws Exception {
         // given
         UserRegisterRequestDto request = buildRegisterRequest(NEW_EMAIL, "password123",
@@ -106,6 +110,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/register: returns 400 for an invalid email format")
     void register_invalidEmail_returnsBadRequest() throws Exception {
         // given
         UserRegisterRequestDto request = buildRegisterRequest("not-an-email", "password123",
@@ -122,6 +127,7 @@ class AuthControllerTest {
 
 
     @Test
+    @DisplayName("POST /auth/login: valid credentials return a JWT token")
     @Sql(scripts = ADD_USER_SQL, executionPhase = BEFORE_TEST_METHOD)
     @Sql(scripts = REMOVE_USER_SQL, executionPhase = AFTER_TEST_METHOD)
     void login_validCredentials_returnsToken() throws Exception {
@@ -139,6 +145,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/login: returns 401 for a wrong password")
     @Sql(scripts = ADD_USER_SQL, executionPhase = BEFORE_TEST_METHOD)
     @Sql(scripts = REMOVE_USER_SQL, executionPhase = AFTER_TEST_METHOD)
     void login_wrongPassword_returnsUnauthorized() throws Exception {
@@ -155,6 +162,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/login: returns 401 for an unknown user")
     void login_unknownUser_returnsUnauthorized() throws Exception {
         // given
         UserLoginRequestDto request = buildLoginRequest("ghost@example.com", "password123");
@@ -169,6 +177,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/login: returns 400 when the email is blank")
     void login_blankEmail_returnsBadRequest() throws Exception {
         // given
         UserLoginRequestDto request = buildLoginRequest("", "password123");

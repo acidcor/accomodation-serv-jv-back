@@ -8,12 +8,14 @@ import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import mate.academy.accommodationbooking.service.dto.stripe.StripeRequestDto;
 import mate.academy.accommodationbooking.service.exception.stripe.StripeDataObjectException;
 import mate.academy.accommodationbooking.service.exception.stripe.StripeEventException;
 import mate.academy.accommodationbooking.service.service.payment.PaymentService;
 import mate.academy.accommodationbooking.service.service.stripe.StripeClientProvider;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
@@ -27,21 +29,19 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
     @Override
     public void handle(String payload, String signature) {
         Event event = null;
-        if (endpointSecret != null && !endpointSecret.isEmpty()
-                && signature != null && !signature.isEmpty()) {
-            try {
-                event = clientProvider
-                        .getClient()
-                        .constructEvent(
-                                payload, signature, endpointSecret
-                        );
-            } catch (SignatureVerificationException e) {
-                throw new StripeEventException(
-                        "Can't create an event through signature verification"
-                );
-            }
-        } else {
-            event = Event.GSON.fromJson(payload, Event.class);
+        if (endpointSecret == null || endpointSecret.isBlank()
+                || signature == null || signature.isBlank()) {
+            throw new StripeEventException(
+                    "Stripe webhook secret or signature is missing"
+            );
+        }
+        try {
+            event = clientProvider.getClient()
+                    .constructEvent(payload, signature, endpointSecret);
+        } catch (SignatureVerificationException e) {
+            throw new StripeEventException(
+                    "Stripe webhook signature verification failed"
+            );
         }
         if (event == null) {
             throw new StripeEventException("Event object can't be null");
@@ -57,7 +57,7 @@ public class StripeWebHookHandlerImpl implements StripeWebHookHandler {
                 break;
             }
             default: {
-                System.out.println("Unhandled event type: " + event.getType());
+                log.error("Unhandled event type: {}", event.getType());
             }
 
         }

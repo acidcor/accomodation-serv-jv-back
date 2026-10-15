@@ -10,12 +10,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import mate.academy.accommodationbooking.service.dto.booking.BookingResponseDto;
 import mate.academy.accommodationbooking.service.dto.telegram.TelegramChatRequestDto;
 import mate.academy.accommodationbooking.service.model.TelegramChat;
 
-@Slf4j
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class TelegramNotificationService implements NotificationService {
