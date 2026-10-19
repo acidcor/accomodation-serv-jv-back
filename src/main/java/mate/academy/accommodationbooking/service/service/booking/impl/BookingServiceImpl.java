@@ -230,7 +230,7 @@ public class BookingServiceImpl implements BookingService, AuthenticatedUserProv
                         BookingStatus.CONFIRMED
                 );
         for (Booking booking : realised) {
-            notificationService.sendBookingExpired(bookingMapper.toDto(booking));
+            notificationService.sendBookingReleased(bookingMapper.toDto(booking));
         }
     }
 

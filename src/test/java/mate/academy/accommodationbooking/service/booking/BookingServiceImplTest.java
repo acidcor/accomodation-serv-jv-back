@@ -770,7 +770,7 @@ class BookingServiceImplTest {
         bookingService.realisedBookings();
 
         // then
-        then(notificationService).should().sendBookingExpired(dto);
+        then(notificationService).should().sendBookingReleased(dto);
         then(bookingRepository).should(never()).saveAll(any());
     }
 

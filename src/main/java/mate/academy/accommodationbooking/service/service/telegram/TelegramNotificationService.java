@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mate.academy.accommodationbooking.service.dto.booking.BookingResponseDto;
 import mate.academy.accommodationbooking.service.dto.telegram.TelegramChatRequestDto;
+import mate.academy.accommodationbooking.service.model.Payment;
 import mate.academy.accommodationbooking.service.model.TelegramChat;
 
 @Log4j2
@@ -24,6 +25,7 @@ public class TelegramNotificationService implements NotificationService {
     private static final String ACTION_CREATED = "created";
     private static final String ACTION_RELEASED = "released";
     private static final String ACTION_CANCELED = "canceled";
+    private static final String ACTION_PAYMENT_CONFIRMED = "confirmed";
     private final TelegramChatService telegramChatService;
 
     @Value("${sk.telegram}")
@@ -83,6 +85,18 @@ public class TelegramNotificationService implements NotificationService {
         sendMessage(message);
     }
 
+    @Override
+    public void sendPaymentConfirmed(Payment confirmed) {
+        String message = createMessage(confirmed, ACTION_PAYMENT_CONFIRMED);
+        sendMessage(message);
+    }
+
+    @Override
+    public void sendPaymentExpired(Payment expired) {
+        String message = createMessage(expired, ACTION_EXPIRED);
+        sendMessage(message);
+    }
+
     private boolean checkChat(Long chatId) {
         return telegramChatService.existsTelegramChatByChatId(chatId);
     }
@@ -101,6 +115,19 @@ public class TelegramNotificationService implements NotificationService {
                 responseDto.getCheckIn(),
                 responseDto.getCheckOut(),
                 responseDto.getStatus()
+        );
+    }
+
+    private String createMessage(Payment payment, String action) {
+        return String.format(
+                """
+                Payment was %s
+                Payment ID: %s
+                Booking ID: %s
+                """,
+                action,
+                payment.getId(),
+                payment.getBooking().getId()
         );
     }
 
