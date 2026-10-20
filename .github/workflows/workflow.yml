@@ -15,5 +15,7 @@ jobs:
           java-version: '26'
           distribution: 'temurin'
           cache: maven
+      - name: Check style
+        run: ./mvnw checkstyle:check
       - name: Build with Maven
         run: ./mvnw --batch-mode --update-snapshots verify

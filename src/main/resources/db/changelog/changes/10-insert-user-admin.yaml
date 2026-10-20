@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-user-admin
+      author: acor
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: password
+                  value: '$2a$12$kbqiWZzYIxYHiXZQ4wezEedpNLJYnyst6unUl3lNIi6n1DfcXkf/S'
+              - column:
+                  name: email
+                  value: 'admin@email.com'
+              - column:
+                  name: first_name
+                  value: 'Admin'
+              - column:
+                  name: last_name
+                  value: 'User'
+              - column:
+                  name: is_deleted
+                  value: 0
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: role_id
+                  value: 1
+

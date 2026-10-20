@@ -1,0 +1,63 @@
+package mate.academy.accommodationbooking.service.service.telegram;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import mate.academy.accommodationbooking.service.dto.telegram.TelegramChatRequestDto;
+import mate.academy.accommodationbooking.service.dto.telegram.TelegramChatResponseDto;
+import mate.academy.accommodationbooking.service.exception.notfound.EntityNotFoundException;
+import mate.academy.accommodationbooking.service.mapper.TelegramChatMapper;
+import mate.academy.accommodationbooking.service.model.TelegramChat;
+import mate.academy.accommodationbooking.service.repository.TelegramChatRepository;
+
+@RequiredArgsConstructor
+@Service
+@Transactional
+public class TelegramChatServiceImpl implements TelegramChatService {
+    private final TelegramChatMapper telegramChatMapper;
+    private final TelegramChatRepository telegramChatRepository;
+
+    @Override
+    public Page<TelegramChatResponseDto> getAll(Pageable pageable) {
+        return telegramChatRepository.findAll(pageable).map(telegramChatMapper::toDto);
+    }
+
+    @Override
+    public TelegramChatResponseDto addNewChat(TelegramChatRequestDto request) {
+        TelegramChat chat = telegramChatMapper.toEntity(request);
+        return telegramChatMapper.toDto(telegramChatRepository.save(chat));
+    }
+
+    @Override
+    public List<TelegramChat> getSubscribedInner() {
+        return new ArrayList<>(telegramChatRepository.findTelegramChatsByIsSubscribed(true));
+    }
+
+    @Override
+    public TelegramChatResponseDto changeSubscriptionById(Long id) {
+        TelegramChat chat = telegramChatRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Can't find telegram chat by Id: " + id)
+        );
+        chat.setSubscribed(!chat.isSubscribed());
+        return telegramChatMapper.toDto(telegramChatRepository.save(chat));
+    }
+
+    @Override
+    public void delete(Long id) {
+        telegramChatRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByChatId(Long id) {
+        telegramChatRepository.deleteByChatId(id);
+    }
+
+    @Override
+    public boolean existsTelegramChatByChatId(Long chatId) {
+        return telegramChatRepository.existsTelegramChatByChatId(chatId);
+    }
+}

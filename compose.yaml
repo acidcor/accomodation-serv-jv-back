@@ -1,10 +1,37 @@
 services:
   mariadb:
-    image: 'mariadb:latest'
+    image: mariadb:latest
+    restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      - 'MARIADB_DATABASE=mydatabase'
-      - 'MARIADB_PASSWORD=secret'
-      - 'MARIADB_ROOT_PASSWORD=verysecret'
-      - 'MARIADB_USER=myuser'
+      MARIADB_ROOT_PASSWORD: ${DB_PASS}
+      MARIADB_DATABASE: ${DB_NAME}
     ports:
-      - '3306'
+      - "${DB_LOCAL_PORT}:${DB_DOCKER_PORT}"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  app:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: on-failure
+    image: posts-service
+    build: .
+    env_file:
+      - ./.env
+    ports:
+      - "${SPRING_APP_PORT}:${DOCKER_APP_PORT}"
+      - "${DEBUG_PORT}:${DEBUG_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://mariadb:${DB_DOCKER_PORT}/${DB_NAME}"
+      SPRING_DATASOURCE_USERNAME: "${DB_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASS}"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "${DB_DRIVER}"
+      SPRING_JPA_DATABASE_PLATFORM: "${DB_PLATFORM}"
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
